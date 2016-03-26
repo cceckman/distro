@@ -42,9 +42,10 @@ for a build on top of Arch.
     platform-independent code.
   - Separate user-specific / user-preference code from common code; integrate
     with user setup and hooks. 
-- Support:
+- Support environments:
   - Raspberry Pi
   - Google Cloud, including initializing the VM
   - Amazon VMs
-- Do:
+- Add:
   - All the TODOs in the code today.
+  - U2F authentication via [PAM](https://developers.yubico.com/pam-u2f/)
