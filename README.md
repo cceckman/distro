@@ -7,6 +7,10 @@ A Linux build brought to you by [Arch](http://archlinux.org) and [cceckman](http
 ...it's a set of scripts that set up a base Arch image, and initialize it with
 my (cceckman's) development environment.
 
+### How does it work?
+See more about the ~actual~ planned architecture in
+[architecture.md](architecture.md).
+
 ### What are you trying to do here?
 I'm trying to be able to reliably repropduce my development environment.
 No hours remembering which packages are needed, listing repositories out,
