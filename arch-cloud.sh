@@ -9,7 +9,7 @@ exit
 ## https://github.com/GoogleCloudPlatform/compute-archlinux-image-builder
 ## 
 
-# TODO first: refactor arch-install.sh into a collection of scripts.
+# TODO first: refactor arch-vm.sh into a collection of scripts.
 # TODO:
 #  Prompt for image, or make a new one.
 #  Start up VM.
@@ -17,3 +17,4 @@ exit
 #  Trigger the appropriate arch-install.sh factors (after refactoring it.)
 #  Add VNC-over-VPN configuration per https://medium.com/google-cloud/linux-gui-on-the-google-cloud-platform-800719ab27c5#.igi2a5x4g
 #   Or, VNC-over-SSH-tunnel, like http://www.cl.cam.ac.uk/research/dtg/attarchive/vnc/sshvnc.html
+

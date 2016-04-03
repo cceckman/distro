@@ -17,7 +17,7 @@
 # To run:
 #  bash --init-file <(curl -L -o- cceckman.com/distro)
 # That does
-#  curl -o /tmp/arch-install.sh https://raw.githubusercontent.com/cceckman/Tilde/arch-setup/arch-install.sh
+#  curl -o /tmp/arch-vm.sh https://raw.githubusercontent.com/cceckman/Tilde/arch-setup/arch-install.sh
 #  chmod +x /tmp/arch-install.sh && /tmp/arch-install.sh base-install
 
 # Modes:
