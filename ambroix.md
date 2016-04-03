@@ -1,5 +1,5 @@
 ### Preface
-The below describes the design of a system that *does not exist*. Yet.
+The below describes the design of a system that **does not exist**. Yet.
 See #1 for plans and progress.
 
 # Ambroix Installer
@@ -24,25 +24,25 @@ The main script is [ambroix.sh](ambroix.sh). It should be invoked as
 - `verify`: Verify that this platform can run on this host.[^sane] This may
   include checking for the presence of `tar`, `curl`, a binary toolchain, etc.
   It may also attempt to install these dependencies.
-  Run on the *host*.
+  Run on the **host**.
 - `prompt`: Gather necessary information: new user(s), keys / auth tokens, etc.
   from the user.  
-  Run on the *host*.
+  Run on the **host**.
 - `image`: Prepares a machine for its first boot. Set up the image, make it
   reachable, and configure it to run the subsequent stages on its next boot.
-  Run on the *host*.
+  Run on the **host**.
 - `firstboot`: Run on the first (re)boot of the target. May
   install packages, reconfigure settings, etc. to establish reachability.
-  Run on the *target*.
+  Run on the **target**.
 - `firstlogin`: Run at the user's first login. May prompt for additional
   information, e.g. new password, credentials, etc. before continuing on to
   subsequent steps.
-  Run on the *target*.
+  Run on the **target**.
 
 ### Host and target
-The initial hooks are triggered on the *host* machine, i.e. where the user is
+The initial hooks are triggered on the **host** machine, i.e. where the user is
 sitting while setting up the Ambroix machine. Subsequent hooks are triggered on
-the target, i.e. the machine being installed.
+the **target**, i.e. the machine being installed.
 
 In some cases, "host" and "target" represent different incarnations of the same
 physical device: e.g. booted from a LiveCD versus booted from an installed disk.
@@ -75,7 +75,7 @@ contains common scripts/programs, libraries, and configuration.
 ### Platform Hooks
 Platform hooks are located in the [platforms](platforms/) directory; each
 platform gets a subdirectory (which defines the platform's name.) Each platform
-*must* support each stage, i.e. have a hook for the stage; even if that hook
+**must** support each stage, i.e. have a hook for the stage; even if that hook
 is a script that runs `exit 0`.
 
 ### User Hooks
