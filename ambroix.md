@@ -18,7 +18,9 @@ the target platform.
 ## Main script
 The main script is [ambroix.sh](ambroix.sh). It should be invoked as
 
-  ambroix.sh &lt;platform&gt; &lt;user&gt;
+```shell
+ambroix.sh &lt;platform&gt; &lt;user&gt;
+```
 
 ## Stages
 - `verify`: Verify that this platform can run on this host.[^sane] This may
@@ -57,11 +59,13 @@ script triggers the relevant hook for the platform, then the hook for the user.
 ### Promptfiles
 Hooks are invoked as
 
-  platforms/&lt;platform&gt;/&lt;stage&gt; &lt;platform promptfile path&gt;
-
+```shell
+platforms/&lt;platform&gt;/&lt;stage&gt; &lt;platform promptfile path&gt;
+```
 or
-
-  users/&lt;username&gt;/&lt;stage&gt; &lt;user promptfile path&gt;
+```shell
+users/&lt;username&gt;/&lt;stage&gt; &lt;user promptfile path&gt;
+```
 
 `promptfile path` is the path to some file that the hook can understand, read
 from, and write to; it's opaque to system. Usually, it's a file that the
@@ -90,5 +94,7 @@ defines some hooks that can be cloned and specialized. Since `-templates`
 [should not](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_431)
 be used as a user name on POSIX-compliant systems, it should be safe to use
 here.
+
+
 
 [^sane]: Canonically: check that the build environment is sane.
