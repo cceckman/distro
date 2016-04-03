@@ -8,8 +8,7 @@ A Linux build brought to you by [Arch](http://archlinux.org) and [cceckman](http
 my (cceckman's) development environment.
 
 ### How does it work?
-See more about the ~actual~ planned architecture in
-[architecture.md](architecture.md).
+See more about the ~~actual~~ planned architecture in [ambroix.md](ambroix.md).
 
 ### What are you trying to do here?
 I'm trying to be able to reliably repropduce my development environment.
