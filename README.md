@@ -41,15 +41,16 @@ for a build on top of Arch.
 
 ## Plans
 
-- Refactor:
-  - Structure along a "hooks" pattern, to better separate platform-dependent and
-    platform-independent code.
-  - Separate user-specific / user-preference code from common code; integrate
-    with user setup and hooks. 
-- Support environments:
-  - Raspberry Pi
-  - Google Cloud, including initializing the VM
-  - Amazon VMs
-- Add:
-  - All the TODOs in the code today.
-  - U2F authentication via [PAM](https://developers.yubico.com/pam-u2f/)
+[ ] Refactor:
+  [ ] Write a plan for the below.
+  [ ] Structure along a "hooks" pattern, to better separate platform-dependent and
+      platform-independent code.
+  [ ] Separate user-specific / user-preference code from common code; integrate
+      with user setup and hooks. 
+[ ] Support environments:
+  [ ] Raspberry Pi
+  [ ] Google Cloud, including initializing the VM
+  [ ] Amazon VMs
+[ ] Add:
+  [ ] All the TODOs in the code today.
+  [ ] U2F authentication via [PAM](https://developers.yubico.com/pam-u2f/)
