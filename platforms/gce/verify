@@ -4,17 +4,24 @@
 
 echo "Checking sane host environment for GCE platform..."
 
-f=../../common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
 # Test gcloud command
-depend gcloud
-if (( $? == 2 ))
-then
-  # Check Python dependency
-  { 
-    depend python2 && python2 -V 2>&1 | grep -q '[ ]2[.]7[.][0-9]*';
-  } || {
-    >&2 echo "Python dependency for gcloud not met; please install Python 2.7." && \
-      exit 2;
-  }
-fi
+depend gcloud || {
+  # We don't try to install the Google Cloud SDK. The recommended method is
+  # "curl | bash", but that's pretty not safe; the instructions also
+  # call for a shell restart in the middle, which is not really what we want
+  # to do in the middle of a script. So: point to the directions.
+  >&2 cat - <<EOD
+The Google Cloud SDK is not installed, or the gcloud command is not in your
+PATH.
+
+You can find instructions for installing the Google Cloud SDK at
+https://cloud.google.com/sdk/. Please be aware of the risks and concerns
+invovled with piping 'curl' to 'bash'.
+
+When you've installed the Google Cloud SDK, you can run Ambroix again.
+EOD
+  exit 3;
+}
+

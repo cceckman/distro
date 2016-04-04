@@ -36,7 +36,7 @@ then
 fi
 
 p="$1" # Platform
-u="$1" # User
+u="$2" # User
 HOOKS="verify"
 
 # PRE-STAGE
@@ -73,6 +73,21 @@ do
   fi
 done
 
+# Make
+PLAT_PROMPT=$(mktemp)
+USER_PROMPT=$(mktemp)
+
 # Run stages independently, since we don't run them all on the host.
 # VERIFY
-
+echo "Running hook 'verify' for platform '$p'"
+platforms/$p/verify $PLAT_PROMPT || {
+  >&2 echo "'verify' step exited with code $?; terminating."
+  exit $?
+}
+if [ -f "users/$u/verify" ] && [ -x "users/$u/verify" ]
+then
+  echo "Running hook 'verify' for user '$u'"
+  users/$u/verify $USER_PROMPT
+else
+  echo "Hook 'verify' for user '$u' not found; skipping."
+fi
