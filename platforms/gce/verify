@@ -5,3 +5,16 @@
 echo "Checking sane host environment for GCE platform..."
 
 f=../../common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+
+# Test gcloud command
+depend gcloud
+if (( $? == 2 ))
+then
+  # Check Python dependency
+  { 
+    depend python2 && python2 -V 2>&1 | grep -q '[ ]2[.]7[.][0-9]*';
+  } || {
+    >&2 echo "Python dependency for gcloud not met; please install Python 2.7." && \
+      exit 2;
+  }
+fi

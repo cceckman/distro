@@ -60,7 +60,7 @@ fi
 
 for hook in $HOOKS
 do
-  if ! [ -d "platforms/$p/$hook" ] || ! [ -x "platforms/$p/$hook" ]
+  if ! [ -f "platforms/$p/$hook" ] || ! [ -x "platforms/$p/$hook" ]
   then
     >&2 echo "Hook '$hook' for platform '$p' not found, or is not executable."
     >&2 echo "Required hooks:"
