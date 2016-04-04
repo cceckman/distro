@@ -11,6 +11,19 @@ f=common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/yesno.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/prompt.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+
+_GcloudOrErr(){
+  results=$( $@ ) || {
+    ret=$?
+    err "Error code $ret return from command '$1'"
+    return $ret
+  }
+  echo "$results"
+  return $ret
+}
+# Prints just the name of the entity.
+_gcfmt="--format 'csv[no-heading](name)'"
 
 while true
 do
@@ -29,7 +42,7 @@ do
   echo "You may terminate Ambroix by exiting with a non-zero status."
   $SHELL  || {
     ret=$?
-    >&2 echo "Shell exited with status $ret; stopping Ambroix."
+    err "Shell exited with status $ret; stopping Ambroix."
     exit $ret
   }
 done
@@ -40,20 +53,51 @@ do
   prompt "What would you like the new instance named?"
   read instance
   ## Check if there's already a machine with that name in the project.
-  instances=$(gcloud --format=flattened compute instances list "$instance") || {
-    ret=$?
-    >&2 echo "Error getting instance names (returned $ret)"
-    exit $ret
+  instances=$(_GcloudOrErr "gcloud $_gcfmt compute instances list $instance") || {
+    exit $?
   }
   if [[ "$instances" == "" ]]
   then
+    pfset $1 "instance" "$instance" && echo "Instance '$instance' OK."
     break
   else
-    >&2 echo "Machine name '$instance' appears to be in use. Please select another."
+    err "Machine name '$instance' appears to be in use. Please select another."
   fi
 done
 
-pfset $1 "instance" "$instance"
+# Image
+while true
+do
+  if yesno "Would you like to use an existing Arch image?"
+  then
+    while true
+    do
+      prompt "Please provide the name of the image in GCE."
+      read imgname
+      images=$(_GcloudOrErr "gcloud $_gcfmt compute images list $name") || {
+        exit $?
+      }
+      if [[ "$images" == "" ]]
+      then
+        err "Existing image $imgname not found."
+        err "Please provide an image in your project."
+        # TODO: support adding an image by path at the command-line.
+      else
+        name=$(echo "$images" | awk '{print $1}')
+        if yesno "Re-use existing image $name?"
+        then
+          pfset $1 "image" "$name" && echo "Image '$name' found."
+          break 2
+        fi
+      fi
+    done
+  else
+    # TODO Support building a new image.
+    err "Building a new image is not yet supported."
+  fi
+done
+
+
 
 
 echo "Collected information about '$PLATFORM'!"

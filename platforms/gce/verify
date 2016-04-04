@@ -6,6 +6,7 @@ PLATFORM='gce'
 echo "Checking sane host environment for platform '$PLATFORM'..."
 
 f=common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
 # Test gcloud command
 depend gcloud || {
@@ -13,7 +14,7 @@ depend gcloud || {
   # "curl | bash", but that's pretty not safe; the instructions also
   # call for a shell restart in the middle, which is not really what we want
   # to do in the middle of a script. So: point to the directions.
-  >&2 cat - <<EOD
+  read -r -d '' msg <<EOD
 The Google Cloud SDK is not installed, or the gcloud command is not in your
 PATH.
 
@@ -23,6 +24,7 @@ invovled with piping 'curl' to 'bash'.
 
 When you've installed the Google Cloud SDK, you can run Ambroix again.
 EOD
+  err "$msg"
   exit 3;
 }
 
