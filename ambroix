@@ -1,0 +1,79 @@
+#!/bin/bash -i
+# Bootstrap an Arch system.
+
+# Utilities before anything else: "print a usage message"
+SITE="http://github.com/cceckman/distro"
+usage() {
+ PRRET="$?" 
+  cat - <<EOS
+Usage:
+  $0 <platform> <user>
+where <platform> is one of those found in platforms/.
+
+Requires, on the host machine:
+  which; mktemp; bash; and anything required from the platform-dependent
+  "verify" hook.
+
+See $SITE for more complete usage information.
+EOS
+  exit "$PRRET"
+}
+# Check presence before sourcing
+src() {
+  F="$1"
+  if ! [[ -f $F ]]
+  then
+    >&2 echo "Aborting: Could not find included file '$F'"
+    exit $2
+  fi
+  source "$F"
+}
+
+if (( $# != 2 ))
+then
+  >&2 echo "Wrong number of arguments"
+  usage 1
+fi
+
+p="$1" # Platform
+u="$1" # User
+HOOKS="verify"
+
+# PRE-STAGE
+## Includes
+src common/depend.fn.sh
+
+## Host Dependencies
+depend mktemp || usage $?
+
+## Check for platform, platform hooks
+if ! [[ -d "platforms/$p" ]]
+then
+  >&2 echo "Platform '$p' not found!"
+  >&2 echo "Supported platforms:"
+  for platform in $(ls platforms)
+  do
+    >&2 echo "	$platform"
+  done
+  >&2 echo "See $SITE for more information."
+  exit 2
+fi
+
+for hook in $HOOKS
+do
+  if ! [ -d "platforms/$p/$hook" ] || ! [ -x "platforms/$p/$hook" ]
+  then
+    >&2 echo "Hook '$hook' for platform '$p' not found, or is not executable."
+    >&2 echo "Required hooks:"
+    for hoook in $HOOKS
+    do
+      >&2 echo "	$hoook"
+    done
+    >&2 echo "See $SITE for more information."
+    exit 2
+  fi
+done
+
+# Run stages independently, since we don't run them all on the host.
+# VERIFY
+

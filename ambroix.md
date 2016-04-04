@@ -3,7 +3,7 @@ The below describes the design of a system that **does not exist**. Yet.
 See #1 for plans and progress.
 
 # Ambroix Installer
-An Ambroix machine is built by running the [ambroix.sh](ambroix.sh) script with
+An Ambroix machine is built by running the [ambroix](ambroix) script with
 two parameters, `platform` and `user`. `platform` specifies the architecture
 targetted, e.g. a VM on [GCE](http://cloud.google.com/compute) or in
 [VirtualBox](http://virtualbox.org); or a physical device such as a
@@ -16,10 +16,10 @@ for the user. The script eventually directs the user to continue setup on
 the target platform.
 
 ## Main script
-The main script is [ambroix.sh](ambroix.sh). It should be invoked as
+The main script is [ambroix](ambroix). It should be invoked as
 
 ```shell
-ambroix.sh &lt;platform&gt; &lt;user&gt;
+ambroix &lt;platform&gt; &lt;user&gt;
 ```
 
 ## Stages
@@ -71,6 +71,11 @@ users/&lt;username&gt;/&lt;stage&gt; &lt;user promptfile path&gt;
 from, and write to; it's opaque to system. Usually, it's a file that the
 `prompt` hook fills with information from the user, and subsequent stages use
 to tweak their behavior.
+
+Note the implications of the above:
+- When invoking hooks, user is implicit for user hooks, and platform is 
+  implicit for platform hooks.
+- Platform hooks don't know the user, and user hooks don't know the platform.
 
 ### Common code
 Since many platforms will share the same code, the [common](common/) directory
