@@ -19,7 +19,7 @@ the target platform.
 The main script is [ambroix](ambroix). It should be invoked as
 
 ```shell
-ambroix &lt;platform&gt; &lt;user&gt;
+ambroix <platform> <user>
 ```
 
 ## Stages
@@ -60,11 +60,11 @@ script triggers the relevant hook for the platform, then the hook for the user.
 Hooks are invoked as
 
 ```shell
-platforms/&lt;platform&gt;/&lt;stage&gt; &lt;platform promptfile path&gt;
+platforms/<platform>/<stage> <platform promptfile path>
 ```
 or
 ```shell
-users/&lt;username&gt;/&lt;stage&gt; &lt;user promptfile path&gt;
+users/<username>/<stage> <user promptfile path>
 ```
 
 `promptfile path` is the path to some file that the hook can understand, read

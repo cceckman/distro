@@ -1,0 +1,7 @@
+#!/bin/bash -i
+# Ambroix for GCE
+# Verify / establish a sane environment for deploying a GCE instance.
+
+echo "Checking sane host environment for GCE platform..."
+
+f=../../common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }

@@ -23,7 +23,7 @@ src() {
   F="$1"
   if ! [[ -f $F ]]
   then
-    >&2 echo "Aborting: Could not find included file '$F'"
+    
     exit $2
   fi
   source "$F"
@@ -40,8 +40,7 @@ u="$1" # User
 HOOKS="verify"
 
 # PRE-STAGE
-## Includes
-src common/depend.fn.sh
+f=common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
 ## Host Dependencies
 depend mktemp || usage $?

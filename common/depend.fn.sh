@@ -1,6 +1,6 @@
-# depend: Function for hard dependencies.
-## Use `which` to find a program, and exit if not found.
+# Functions for hard dependencies.
 
+## Use `which` to find a program, and exit if not found.
 depend() {
   bin="$1"
   # Need which to find other programs..
