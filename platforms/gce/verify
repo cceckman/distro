@@ -1,8 +1,9 @@
 #!/bin/bash -i
 # Ambroix for GCE
 # Verify / establish a sane environment for deploying a GCE instance.
+PLATFORM='gce'
 
-echo "Checking sane host environment for GCE platform..."
+echo "Checking sane host environment for platform '$PLATFORM'..."
 
 f=common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
@@ -25,3 +26,7 @@ EOD
   exit 3;
 }
 
+# Later on (in `prompt`), we'll want to check that the gcloud configuration is
+# correct & filled appropriately.
+
+echo "Environment for platform '$PLATFORM' appears sane!"

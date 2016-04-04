@@ -11,7 +11,7 @@ Usage:
 where <platform> is one of those found in platforms/.
 
 Requires, on the host machine:
-  which; mktemp; bash; and anything required from the platform-dependent
+  which; mktemp; bash; grep; and anything required from the platform-dependent
   "verify" hook.
 
 See $SITE for more complete usage information.
@@ -37,13 +37,15 @@ fi
 
 p="$1" # Platform
 u="$2" # User
-HOOKS="verify"
+STAGES="verify prompt"
 
 # PRE-STAGE
 f=common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
 ## Host Dependencies
 depend mktemp || usage $?
+depend grep || usage $?
+
 
 ## Check for platform, platform hooks
 if ! [[ -d "platforms/$p" ]]
@@ -58,13 +60,13 @@ then
   exit 2
 fi
 
-for hook in $HOOKS
+for hook in $STAGES
 do
   if ! [ -f "platforms/$p/$hook" ] || ! [ -x "platforms/$p/$hook" ]
   then
     >&2 echo "Hook '$hook' for platform '$p' not found, or is not executable."
     >&2 echo "Required hooks:"
-    for hoook in $HOOKS
+    for hoook in $STAGES
     do
       >&2 echo "	$hoook"
     done
@@ -76,18 +78,30 @@ done
 # Make
 PLAT_PROMPT=$(mktemp)
 USER_PROMPT=$(mktemp)
+echo "Using promptfiles:"
+echo "  plat: $PLAT_PROMPT"
+echo "  user: $USER_PROMPT"
 
-# Run stages independently, since we don't run them all on the host.
-# VERIFY
-echo "Running hook 'verify' for platform '$p'"
-platforms/$p/verify $PLAT_PROMPT || {
-  >&2 echo "'verify' step exited with code $?; terminating."
-  exit $?
-}
-if [ -f "users/$u/verify" ] && [ -x "users/$u/verify" ]
-then
-  echo "Running hook 'verify' for user '$u'"
-  users/$u/verify $USER_PROMPT
-else
-  echo "Hook 'verify' for user '$u' not found; skipping."
-fi
+# Run stages semi-independently, since we don't run later stages on the host.
+HOST_STAGES="verify|prompt|image"
+for stage in $( echo "$STAGES" | grep -Po "$HOST_STAGES" )
+do
+  echo "Running hook '$stage' for platform '$p'"
+  platforms/$p/$stage $PLAT_PROMPT || {
+    ret=$?
+    >&2 echo "'$stage' for platform '$p' exited with code $ret; terminating."
+    exit $ret
+  }
+  if [ -f "users/$u/$stage" ] && [ -x "users/$u/$stage" ]
+  then
+    echo "Running hook '$stage' for user '$u'"
+    users/$u/$stage $USER_PROMPT || {
+      ret=$?
+      >&2 echo "'$stage' step for user '$u' exited with code $ret; terminating."
+      exit $ret
+    }
+  else
+    echo "Hook '$stage' for user '$u' not found; skipping."
+  fi
+done
+

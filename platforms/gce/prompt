@@ -1,0 +1,59 @@
+#!/bin/bash -i
+# Ambroix for GCE
+# Prompt for local and remote settings.
+
+PLATFORM='gce'
+
+echo "Prompting for information about '$PLATFORM'..."
+
+# Collect plugins
+f=common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/yesno.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/prompt.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+
+while true
+do
+  echo "Here are the current named configurations for gcloud:"
+  gcloud config configurations list
+
+  if yesno "Is the one you want to use active?"
+  then
+    # TODO: Perform validation, e.g. that fields are populated;
+    # Break (only) on success.
+    break
+  fi
+  echo "Please use this shell to generate and activate a gcloud configuration" \
+    "to use for Ambroix. "
+  echo "'gcloud help config configurations' may help."
+  echo "You may terminate Ambroix by exiting with a non-zero status."
+  $SHELL  || {
+    ret=$?
+    >&2 echo "Shell exited with status $ret; stopping Ambroix."
+    exit $ret
+  }
+done
+
+# Machine name
+while true
+do
+  prompt "What would you like the new instance named?"
+  read instance
+  ## Check if there's already a machine with that name in the project.
+  instances=$(gcloud --format=flattened compute instances list "$instance") || {
+    ret=$?
+    >&2 echo "Error getting instance names (returned $ret)"
+    exit $ret
+  }
+  if [[ "$instances" == "" ]]
+  then
+    break
+  else
+    >&2 echo "Machine name '$instance' appears to be in use. Please select another."
+  fi
+done
+
+pfset $1 "instance" "$instance"
+
+
+echo "Collected information about '$PLATFORM'!"
