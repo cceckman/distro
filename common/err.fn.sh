@@ -4,7 +4,7 @@ depend tput
 
 # Color support shamelessly stolen from stackoverflow:
 # https://unix.stackexchange.com/questions/9957/how-to-check-if-bash-can-print-colors
-if [ -t 1 ] && [ -n "$(tput colors)"] && [ "$(tput colors)" -ge 8 ]
+if [ -t 1 ] && [ -n "$(tput colors)" ] && [ "$(tput colors)" -ge 8 ]
 then
   bold="$(tput bold)"
 	underline="$(tput smul)"
