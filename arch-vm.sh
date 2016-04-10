@@ -83,10 +83,13 @@ then
 
   prompt 'Generate moduli [y/N]'
   read genmoduli
-  
+
+  # All of this goes in the per-user file...  
   prompt 'GitHub username'
   read githubuser
 
+  # And this is unnecessary, as we don't need to be adding new keys on the machine
+  # if we're (properly) using ssh-agent.
   prompt 'GitHub API access token (with write:public_key scope)'
   read githubtoken
 

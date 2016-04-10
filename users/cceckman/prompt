@@ -1,0 +1,25 @@
+#!/bin/bash -i
+
+USER='cceckman' # Yep, overriding a builtin. Deal with it.
+
+echo "Prompting for user $USER's information..."
+promptfile="$1"
+echo "Storing in promptfile $promptfile."
+
+
+# Collect plugins
+f=common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/yesno.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/prompt.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+
+msg="Provide an initial authorized_key for $USER? \
+Note: you may not be able to log in to the target if this is not provided."
+if yesno "$msg"
+  prompt "authorized_key for $USER?"
+  read authkey
+  pfset "$promptfile" "authkey" "$authkey" && echo "Instance '$instance' OK."
+else
+  pfset "$promptfile" "authkey" ""
+fi
