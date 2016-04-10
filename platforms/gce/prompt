@@ -5,6 +5,9 @@
 PLATFORM='gce'
 
 echo "Prompting for information about '$PLATFORM'..."
+promptfile="$1"
+echo "Storing in promptfile $promptfile."
+
 
 # Collect plugins
 f=common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
@@ -58,7 +61,7 @@ do
   }
   if [[ "$instances" == "" ]]
   then
-    pfset $1 "instance" "$instance" && echo "Instance '$instance' OK."
+    pfset "$promptfile" "instance" "$instance" && echo "Instance '$instance' OK."
     break
   else
     err "Machine name '$instance' appears to be in use. Please select another."
@@ -72,23 +75,27 @@ do
   then
     while true
     do
-      prompt "Please provide the name of the image in GCE."
-      read imgname
-      images=$(_GcloudOrErr "gcloud $_gcfmt compute images list $name") || {
-        exit $?
+      echo "Existing images: "
+      echo "$(_GcloudOrErr 'gcloud compute images list')" || {
+        result="$?"
+        err "Could not get images from your project!"
+        exit $result
       }
-      if [[ "$images" == "" ]]
+      prompt "Please select an Arch image:"
+      read imgname
+      images=$(_GcloudOrErr "gcloud $_gcfmt compute images list $imgname") || {
+        result="$?"
+        err "Could not get images from your project!"
+        err "$images"
+        exit $result
+      }
+      if ! [[ "$images" == "$imgname" ]]
       then
         err "Existing image $imgname not found."
-        err "Please provide an image in your project."
-        # TODO: support adding an image by path at the command-line.
+        err "Please provide the name of an image in your project, or add a new image to your project."
       else
-        name=$(echo "$images" | awk '{print $1}')
-        if yesno "Re-use existing image $name?"
-        then
-          pfset $1 "image" "$name" && echo "Image '$name' found."
-          break 2
-        fi
+        pfset "$promptfile" "image" "$imgname" && echo "Image '$imgname' found."
+        break 2
       fi
     done
   else
