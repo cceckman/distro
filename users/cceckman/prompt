@@ -14,12 +14,6 @@ f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/prompt.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
-msg="Provide an initial authorized_key for $USER? \
-Note: you may not be able to log in to the target if this is not provided."
-if yesno "$msg"
-  prompt "authorized_key for $USER?"
-  read authkey
-  pfset "$promptfile" "authkey" "$authkey" && echo "Instance '$instance' OK."
-else
-  pfset "$promptfile" "authkey" ""
-fi
+# Module for asking about key additions.
+f=common/keys/prompt; source $f || { >&2 echo "$f not found!" && exit 2; }
+# Use corresponding common/keys hooks later to unpack.

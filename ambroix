@@ -41,6 +41,8 @@ STAGES="verify prompt"
 
 # PRE-STAGE
 f=common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/yesno.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
 ## Host Dependencies
 depend mktemp || usage $?
@@ -50,13 +52,13 @@ depend grep || usage $?
 ## Check for platform, platform hooks
 if ! [[ -d "platforms/$p" ]]
 then
-  >&2 echo "Platform '$p' not found!"
-  >&2 echo "Supported platforms:"
+  err "Platform '$p' not found!"
+  err "Supported platforms:"
   for platform in $(ls platforms)
   do
-    >&2 echo "	$platform"
+    err "	$platform"
   done
-  >&2 echo "See $SITE for more information."
+  err "See $SITE for more information."
   exit 2
 fi
 
@@ -64,13 +66,13 @@ for hook in $STAGES
 do
   if ! [ -f "platforms/$p/$hook" ] || ! [ -x "platforms/$p/$hook" ]
   then
-    >&2 echo "Hook '$hook' for platform '$p' not found, or is not executable."
-    >&2 echo "Required hooks:"
+    err "Hook '$hook' for platform '$p' not found, or is not executable."
+    err "Required hooks:"
     for hoook in $STAGES
     do
-      >&2 echo "	$hoook"
+      err "	$hoook"
     done
-    >&2 echo "See $SITE for more information."
+    err "See $SITE for more information."
     exit 2
   fi
 done
@@ -86,20 +88,35 @@ echo "  user: $USER_PROMPT"
 HOST_STAGES="verify|prompt|image"
 for stage in $( echo "$STAGES" | grep -Po "$HOST_STAGES" )
 do
-  echo "Running hook '$stage' for platform '$p'"
-  platforms/$p/$stage $PLAT_PROMPT || {
+  # Platform
+  {
+    echo "Running hook '$stage' for platform '$p'"
+    platforms/$p/$stage $PLAT_PROMPT \
+      && echo "Hook '$stage' for platform '$p' complete."
+  } || {
     ret=$?
-    >&2 echo "'$stage' for platform '$p' exited with code $ret; terminating."
+    err "'$stage' for platform '$p' exited with code $ret; terminating."
     exit $ret
   }
+  # User
   if [ -f "users/$u/$stage" ] && [ -x "users/$u/$stage" ]
   then
-    echo "Running hook '$stage' for user '$u'"
-    users/$u/$stage $USER_PROMPT || {
+    {
+      echo "Running hook '$stage' for user '$u'"
+      users/$u/$stage $USER_PROMPT \
+        && echo "Hook '$stage' for user '$u' complete."
+    } || {
       ret=$?
-      >&2 echo "'$stage' step for user '$u' exited with code $ret; terminating."
+      err "'$stage' hook for user '$u' exited with code $ret; terminating."
       exit $ret
     }
+  elif [ -f "users/$u/$stage" ] && ! [ -x "users/$u/$stage" ]
+  then
+    err "'$stage' hook for user '$u' found, but not executable! This is probably an error."
+    if ! yesno "Continue anyway?"
+    then
+      exit 3
+    fi
   else
     echo "Hook '$stage' for user '$u' not found; skipping."
   fi

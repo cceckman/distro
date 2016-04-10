@@ -1,0 +1,27 @@
+msg="Provide an initial authorized_key for $USER? \
+Note: you may not be able to log in to the target if this is not provided."
+if yesno "$msg"
+then
+  prompt "authorized_key for $USER?"
+  read authkey
+  pfset "$promptfile" "authkey" "$authkey" && echo "Instance '$instance' OK."
+else
+  pfset "$promptfile" "authkey" ""
+fi
+
+msg="Generate new private keys on target machine? \
+Note: you should only do this if you are using this machine directly, not via SSH."
+if yesno "$msg"
+then
+  prompt 'GitHub API access token (with write:public_key scope)?'
+  read githubtoken
+
+  pfset "$promptfile" "genkey" "yes"
+  pfset "$promptfile" "githubtoken" ""
+
+else
+  pfset "$promptfile" "genkey" "no"
+  pfset "$promptfile" "githubtoken" ""
+fi
+
+
