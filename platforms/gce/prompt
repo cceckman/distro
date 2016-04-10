@@ -23,7 +23,7 @@ _GcloudOrErr(){
   return $ret
 }
 # Prints just the name of the entity.
-_gcfmt="--format 'csv[no-heading](name)'"
+_gcfmt="--format csv[no-heading](name)"
 
 while true
 do
@@ -96,8 +96,5 @@ do
     err "Building a new image is not yet supported."
   fi
 done
-
-
-
 
 echo "Collected information about '$PLATFORM'!"
