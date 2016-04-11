@@ -21,13 +21,23 @@ Usage:
     of prompts will be written to them.
 
 Requires, on the host machine:
-  which; mktemp; bash; grep; and anything required from the platform-dependent
-  "verify" hook.
+  which; mktemp; bash; grep; realpath; and anything required from the
+  platform-dependent "verify" hook.
 
 See $SITE for more complete usage information.
 EOS
   exit "$PRRET"
 }
+
+# Dependencies.
+f=common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/yesno.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+
+## Host Dependencies
+depend mktemp || usage $?
+depend grep || usage $?
+depend realpath || usage $?
 
 # Get promptfile arguments
 while getopts :p:u: opt
@@ -36,13 +46,15 @@ do
     p)
       PLAT_PROMPT="$OPTARG"
       shift $((OPTIND-1))
+      OPTIND=1
       ;;
     u)
       USER_PROMPT="$OPTARG"
       shift $((OPTIND-1))
+      OPTIND=1
       ;;
     \?)
-      >&2 echo "Unrecognized option -$opt!"
+      err echo "Unrecognized option -$OPTARG!"
       usage 1
       ;;
   esac
@@ -55,26 +67,25 @@ if [ -z ${USER_PROMPT+x} ]
 then
   USER_PROMPT=$(mktemp)
 fi
+if [[ "$(realpath ${PLAT_PROMPT})" == "$(realpath ${USER_PROMPT})" ]]
+then
+  err "Cannot use the same path for user and platform promptfiles!"
+  usage 1
+fi
+echo "Using promptfiles:"
+echo "  plat: $PLAT_PROMPT"
+echo "  user: $USER_PROMPT"
 
-# And ensure that user and platform are present
+# Ensure that user and platform are present
 if (( $# != 2 ))
 then
-  >&2 echo "Wrong number of arguments"
+  err "Wrong number of arguments"
   usage 1
 fi
 
 p="$1" # Platform
 u="$2" # User
 STAGES="verify prompt image"
-
-# PRE-STAGE
-f=common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
-f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
-f=common/yesno.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
-
-## Host Dependencies
-depend mktemp || usage $?
-depend grep || usage $?
 
 
 ## Check for platform, platform hooks
@@ -104,10 +115,6 @@ do
     exit 2
   fi
 done
-
-echo "Using promptfiles:"
-echo "  plat: $PLAT_PROMPT"
-echo "  user: $USER_PROMPT"
 
 # Run stages semi-independently, since we don't run later stages on the host.
 HOST_STAGES="verify|prompt|image"
