@@ -19,7 +19,7 @@ the target platform.
 The main script is [ambroix](ambroix). It should be invoked as
 
 ```shell
-ambroix <platform> <user>
+./ambroix [-p <pfpath>] [-u <pfpath>] <platform> <user>
 ```
 
 ## Stages
@@ -72,9 +72,14 @@ from, and write to; it's opaque to system. Usually, it's a file that the
 `prompt` hook fills with information from the user, and subsequent stages use
 to tweak their behavior.
 
+The main Ambroix script allows the caller to specify a promptfile, which may
+already be populated; hooks should be aware of this, and allow the user to
+bypass prompts that are already answered; they should also ensure that the
+provided promptfile is actually for the correct platform/user.
+
 Note the implications of the above:
-- When invoking hooks, user is implicit for user hooks, and platform is 
-  implicit for platform hooks.
+- The 'platform' and 'user' parameters implied by the user running the script
+  aren't explicitly passed to the hook.
 - Platform hooks don't know the user, and user hooks don't know the platform.
 
 ### Common code

@@ -7,8 +7,18 @@ usage() {
  PRRET="$?" 
   cat - <<EOS
 Usage:
-  $0 <platform> <user>
-where <platform> is one of those found in platforms/.
+  $0 [-p <pfpath>] [-u <pfpath>] <platform> <user>
+
+  <platform> is one of the subdirectories of platforms/.
+  <user> is the user account to set up on the target machine. Optionally,
+    it may also be a directory in users/.
+  
+  <pfpath> are optional paths to the platform (-p) and user (-u) promptfiles,
+    containing saved information from the last time information was requested
+    from the user. These allow a user to bypass the 'prompt' hooks if a previous
+    run of the script was aborted.
+    These paths may point to files that don't exist, in which case the results
+    of prompts will be written to them.
 
 Requires, on the host machine:
   which; mktemp; bash; grep; and anything required from the platform-dependent
@@ -18,17 +28,35 @@ See $SITE for more complete usage information.
 EOS
   exit "$PRRET"
 }
-# Check presence before sourcing
-src() {
-  F="$1"
-  if ! [[ -f $F ]]
-  then
-    
-    exit $2
-  fi
-  source "$F"
-}
 
+# Get promptfile arguments
+while getops :p:u:
+do
+  case $opt in
+    p)
+      PLAT_PROMPT="$OPTARG"
+      shift $((OPTIND-1))
+      ;;
+    u)
+      USER_PROMPT="$OPTARG"
+      shift $((OPTIND-1))
+      ;;
+    \?)
+      >&2 echo "Unrecognized option -$opt!"
+      usage 1
+      ;;
+  esac
+done
+if [ -z ${PLAT_PROMPT+x} ]
+then
+  PLAT_PROMPT=$(mktemp)
+fi
+if [ -z ${USER_PROMPT+x} ]
+then
+  USER_PROMPT=$(mktemp)
+fi
+
+# And ensure that user and platform are present
 if (( $# != 2 ))
 then
   >&2 echo "Wrong number of arguments"
@@ -37,7 +65,7 @@ fi
 
 p="$1" # Platform
 u="$2" # User
-STAGES="verify prompt"
+STAGES="verify prompt image"
 
 # PRE-STAGE
 f=common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
@@ -77,9 +105,6 @@ do
   fi
 done
 
-# Make
-PLAT_PROMPT=$(mktemp)
-USER_PROMPT=$(mktemp)
 echo "Using promptfiles:"
 echo "  plat: $PLAT_PROMPT"
 echo "  user: $USER_PROMPT"

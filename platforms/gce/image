@@ -1,0 +1,19 @@
+#!/bin/bash -i
+# Ambroix for GCE
+# Start up the GCE VM.
+
+# Collect plugins
+f=common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/yesno.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/prompt.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+
+f=platforms/gce/helpers.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+
+echo "Creating usable image for '$PLATFORM'..."
+promptfile="$1"
+echo "Reading from promptfile $promptfile."
+
+instance=$(pfget "$promptfile" "instance")
+echo "Creating GCE instance $instance"

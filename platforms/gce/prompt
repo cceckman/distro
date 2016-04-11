@@ -2,13 +2,6 @@
 # Ambroix for GCE
 # Prompt for local and remote settings.
 
-PLATFORM='gce'
-
-echo "Prompting for information about '$PLATFORM'..."
-promptfile="$1"
-echo "Storing in promptfile $promptfile."
-
-
 # Collect plugins
 f=common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/yesno.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
@@ -16,17 +9,11 @@ f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/prompt.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
-_GcloudOrErr(){
-  results=$( $@ ) || {
-    ret=$?
-    err "Error code $ret return from command '$1'"
-    return $ret
-  }
-  echo "$results"
-  return $ret
-}
-# Prints just the name of the entity.
-_gcfmt="--format csv[no-heading](name)"
+f=platforms/gce/helpers.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+
+echo "Prompting for information about '$PLATFORM'..."
+promptfile="$1"
+echo "Storing in promptfile $promptfile."
 
 while true
 do
