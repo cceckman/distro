@@ -17,3 +17,5 @@ f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 # Module for asking about key additions.
 f=common/keys/prompt; source $f || { >&2 echo "$f not found!" && exit 2; }
 # Use corresponding common/keys hooks later to unpack.
+
+# TODO: Recover and verify information from an existing promptfile.

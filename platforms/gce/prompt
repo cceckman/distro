@@ -11,6 +11,8 @@ f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
 f=platforms/gce/helpers.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
+# TODO: Recover and verify information from an existing promptfile.
+
 echo "Prompting for information about '$PLATFORM'..."
 promptfile="$1"
 echo "Storing in promptfile $promptfile."
