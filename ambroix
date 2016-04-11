@@ -30,7 +30,7 @@ EOS
 }
 
 # Get promptfile arguments
-while getops :p:u:
+while getopts :p:u:
 do
   case $opt in
     p)
