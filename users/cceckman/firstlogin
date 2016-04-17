@@ -2,10 +2,20 @@
 # firstlogin for cceckman. Set up home, etc.
 # This should mostly / probably work on platforms other than Arch.
 
+myuser="cceckman"
+
+f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+
+if [[ "$USER" != "$myuser" ]]
+then
+ err "Uh oh! Expected to set up user $myuser, but acting as $USER instead."
+ exit 9;
+fi
+
 pushd $HOME # Make sure we have a good point of reference.
 
 # TODO Make sure active SSH credentials work for Github; prompt to make new ones
-# or not depending.
+# or not depending on what's available.
 
 # Tilde repository gets special treatment.
 git clone git@github.com:cceckman/Tilde.git Tilde && mv Tilde/.git . && rm -rf Tilde && git reset --hard
@@ -15,15 +25,18 @@ git clone git@github.com:cceckman/Tilde.git Tilde && mv Tilde/.git . && rm -rf T
 GH_REPOS="cceckman/cce3 cceckman/distro cceckman/cceckman.github.io"
 GH_PREFIX="$HOME/r"
 GO_PREFIX="$HOME/go" # Keep in sync with Tilde/.bashrc
-mkdir -p $GH_PREFIX
-mkdir $HOME/r
-for repo in $GH_REPOS
+mkdir -p "${GH_PREFIX}"
+mkdir "${HOME}/r"
+for REPO in "${GH_REPOS}"
 do
-  REPOPATH="${GH_PREFIX}/${repo}"
-  git clone "git@github.com:${repo}" "$REPOPATH"
+  SHORT="$(basename ${REPO})"
+  git clone "git@github.com:${REPO}" "${GH_PREFIX}/${SHORT}" || {
+    err "Error encountered in cloning ${REPO}! Aborting."
+    exit 9
+  }
   # Support Go directory structure. Assume $HOME/go is in $GOPATH.
-  GOTOOLPATH="$GO_PREFIX/src/github.com/${repo}"
-  mkdir -p $(dirname $GOTOOLPATH) && ln -s $REPOPATH $GOTOOLPATH
+  GOTOOLPATH="${GO_PREFIX}/src/github.com/${REPO}"
+  mkdir -p $(dirname $GOTOOLPATH) && ln -s "${GH_PREFIX}/${SHORT}" ${GOTOOLPATH}
 done
 # DONE
 
