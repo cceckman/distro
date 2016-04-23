@@ -17,8 +17,8 @@
 # To run:
 #  bash --init-file <(curl -L -o- cceckman.com/distro)
 # That does
-#  curl -o /tmp/arch-vm.sh https://raw.githubusercontent.com/cceckman/Tilde/arch-setup/arch-install.sh
-#  chmod +x /tmp/arch-install.sh && /tmp/arch-install.sh base-install
+#  curl -o /tmp/arch-vm.sh https://raw.githubusercontent.com/cceckman/Tilde/arch-setup/arch-vm.sh
+#  chmod +x /tmp/arch-ivm.sh && /tmp/arch-ivm.sh base-install
 
 # Modes:
 ## base-install -> assume in live image, set up partitions, etc. on /dev/sda
@@ -147,9 +147,9 @@ then
 
   # Generate /etc/fstab, and hop in to the chroot with the second part of the script.
   genfstab -p /mnt >> /mnt/etc/fstab || exit
-  cp $(realpath $BASH_SOURCE) /mnt/usr/bin/arch-install.sh || exit
+  cp $(realpath $BASH_SOURCE) /mnt/usr/bin/arch-vm.sh || exit
   cp $PROMPTFILE /mnt${PROMPTFILE}
-  arch-chroot /mnt /usr/bin/arch-install.sh setup-chroot
+  arch-chroot /mnt /usr/bin/arch-vm.sh setup-chroot
   
   set +x
   # Restart- remove the drive when it's down, then continue.
@@ -206,7 +206,7 @@ HRD
   # Start this script upon root login:
   touch /root/.bash_profile  # Transparently fix it it doesn't already exist.
   mv /root/.bash_profile /root/.bash_profile.bak
-  echo "/usr/bin/arch-install.sh friendlify" > /root/.bash_profile
+  echo "/usr/bin/arch-vm.sh friendlify" > /root/.bash_profile
   set +x
   trap - EXIT && exit
 elif [[ "$1" == 'friendlify' ]]
