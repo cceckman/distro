@@ -1,0 +1,14 @@
+sudo
+openssh
+intel-ucode
+mlocate
+
+git
+
+rsync
+
+parted
+dosfstools
+ntfsprogs
+
+
