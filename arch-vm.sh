@@ -187,7 +187,7 @@ then
   pacman --noconfirm -S grub
   grub-install --target=i386-pc --recheck /dev/sda
   # Use higher resolution by default: https://askubuntu.com/questions/384602/ubuntu-hyper-v-guest-display-resolution
-  echo 'GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT splash video=hyperv_fb:1920x1080"' >> /etc/default/grub
+  echo 'GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT splash iomem=relaxed"' >> /etc/default/grub
   grub-mkconfig -o /boot/grub/grub.cfg
   
   # And ensure that dhcpcd starts next time around
