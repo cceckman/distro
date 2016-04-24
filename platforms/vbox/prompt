@@ -1,0 +1,64 @@
+#!/bin/bash -i
+# Ambroix for VirtualBox
+# Prompt for local and remote settings.
+
+# Collect plugins
+f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/prompt.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+
+# TODO: Recover and verify information from an existing promptfile.
+
+echo "Prompting for information about '$PLATFORM'..."
+promptfile="$1"
+echo "Storing in promptfile $promptfile."
+
+# Machine name
+while true
+do
+  prompt "What would you like the host named?"
+  read hostname
+  if [[ "$hostname" != '' ]]
+  then
+    pfset "$promptfile" "hostname" "$hostname" && echo "Hostname '$hostname' OK."
+    break
+  else
+    err "'$hostname' is not a valid hostname"
+  fi
+done
+
+# Machine name
+while true
+do
+  prompt "What disk should we install to?"
+  read disk
+  if ! lsblk $disk -dno name >/dev/null
+  then
+    err "'$disk' does not exist"
+    continue
+  elif [[ "$(lsblk $disk -dno type)" == 'part' ]]
+  then
+    err "'$disk' is not of type 'disk'"
+    continue
+  else
+    # Check per-partition conditions
+    for x in $(lsblk $disk -lno name)
+    do
+      dev="/dev/${x}"
+      if ! findmnt $dev >/dev/null
+      then
+        err "'$disk' is not usable; $dev mounted"
+        continue 1
+      elif swapon --noheadings --show=name | grep -q "$dev"
+      then
+        err "'$disk' is not usable; $dev mounted"
+        continue 1
+      fi
+    done
+  fi
+  # None of the excluding conditions met.
+  pfset "$promptfile" "disk" "$disk" && echo "Disk '$disk' OK."
+  break
+done
+
+echo "Collected information about '$PLATFORM'!"

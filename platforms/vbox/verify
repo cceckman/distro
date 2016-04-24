@@ -1,0 +1,23 @@
+#!/bin/bash -i
+# Ambroix for Virtual Box
+# Verify / establish a sane environment for deploying a GCE instance.
+PLATFORM='vbox'
+
+# We expect / intend to run this from a liveCD.
+
+echo "Checking sane host environment for platform '$PLATFORM'..."
+
+f=common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+
+
+for command in "parted mkfs.ext4 mkswap curl timedatectl rankmirrors pacstrap genfstab arch-chroot"
+do
+  depend $command || {
+    err "$command not found in PATH!"
+  }
+  exit 3
+done
+
+
+echo "Environment for platform '$PLATFORM' appears sane!"
