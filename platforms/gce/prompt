@@ -17,80 +17,119 @@ echo "Prompting for information about '$PLATFORM'..."
 promptfile="$1"
 echo "Storing in promptfile $promptfile."
 
-while true
-do
-  echo "Here are the current named configurations for gcloud:"
-  gcloud config configurations list
+KEYS="configuration instance image"
 
-  if yesno "Is the one you want to use active?"
-  then
-    # TODO: Perform validation, e.g. that fields are populated;
-    # Break (only) on success.
-    break
-  fi
-  echo "Please use this shell to generate and activate a gcloud configuration" \
-    "to use for Ambroix. "
-  echo "'gcloud help config configurations' may help."
-  echo "You may terminate Ambroix by exiting with a non-zero status."
-  $SHELL  || {
-    ret=$?
-    err "Shell exited with status $ret; stopping Ambroix."
-    exit $ret
-  }
+[ -f "$promptfile" ] && yesno "Re-use existing values from promptfile '$promptfile'?"
+resuse=$?
+
+for key in $KEYS
+do
+  # For each key, loop through until it gives a satisfactory result.
+  # "satisfactory result" is indicated by 'break'.
+  while true
+  do
+    # Reuse
+    v=$(pfget "$promptfile" "$key" >/dev/null 2>&1)
+    if $? && ( exit $reuse )
+    then
+      echo "Reusing value '$v' for '$image' from promptfile '$f'"
+      break # inner loop
+    fi
+
+    case "$key" in
+      configuration)
+        echo "Here are the current named configurations for gcloud:"
+        gcloud config configurations list
+
+        prompt "Which configuration would you like to use for this project?"
+        read configuration
+
+        # Validate the configuration has the necessary properties set.
+        REQPROPS="properties.core.project properties.core.account properties.compute.zone properties.compute.region"
+        tmpf=$(mktemp)
+        gcloud --format=flattened configurations describe "$configuration" > $tmpf
+
+        problems=''
+        for property in $REQPROPS
+        do
+          if ! grep "^${property}:\w*[a-z]+$" $tmpf
+          then
+            err "Configuration $configuration doesn't have property $property set."
+            problems="$problems $property"
+          fi
+        done
+
+        if [[ "$problems" == '' ]]
+        then
+          echo "Configuration $configuration looks good!"
+          pfset "$promptfile" configuration "$configuration"
+          break
+        else
+          err \
+            "Problems encountered using configuration $configuration." \
+            "Use this shell to resolve them, then try again; " \
+            "'gcloud help config configurations' may help. " \
+            "You may terminate Ambroix by exiting with a non-zero status."
+          $SHELL  || {
+            ret=$?
+            err "Shell exited with status $ret; stopping Ambroix."
+            exit $ret
+          }
+        fi       
+        ;;
+
+      instance)
+        prompt "What would you like the new instance named?"
+        read instance
+        ## Check if there's already a machine with that name in the project.
+        instances=$(_GcloudOrErr "gcloud $_gcfmt compute instances list $instance") || {
+          exit $?
+        }
+        if [[ "$instances" == "" ]]
+        then
+          pfset "$promptfile" "instance" "$instance" && echo "Instance '$instance' OK."
+          break
+        else
+          err "Machine name '$instance' appears to be in use. Please select another."
+        fi
+        ;;
+
+      image)
+        if yesno "Would you like to use an existing Arch image?"
+        then
+          while true
+          do
+            echo "Existing images: "
+            echo "$(_GcloudOrErr 'gcloud compute images list')" || {
+              result="$?"
+              err "Could not get images from your project!"
+              exit $result
+            }
+            prompt "Please select an Arch image:"
+            read imgname
+            images=$(_GcloudOrErr "gcloud $_gcfmt compute images list $imgname") || {
+              result="$?"
+              err "Could not get images from your project!"
+              err "$images"
+              exit $result
+            }
+            if ! [[ "$images" == "$imgname" ]]
+            then
+              err "Existing image $imgname not found."
+              err "Please provide the name of an image in your project, or add a new image to your project."
+            else
+              pfset "$promptfile" "image" "$imgname" && echo "Image '$imgname' found."
+              break 2
+            fi
+          done
+        else
+          # TODO Support building a new image.
+          err "Building a new image is not yet supported."
+        fi
+        ;;
+    esac
+  done
 done
 
-# Machine name
-while true
-do
-  prompt "What would you like the new instance named?"
-  read instance
-  ## Check if there's already a machine with that name in the project.
-  instances=$(_GcloudOrErr "gcloud $_gcfmt compute instances list $instance") || {
-    exit $?
-  }
-  if [[ "$instances" == "" ]]
-  then
-    pfset "$promptfile" "instance" "$instance" && echo "Instance '$instance' OK."
-    break
-  else
-    err "Machine name '$instance' appears to be in use. Please select another."
-  fi
-done
-
-# Image
-while true
-do
-  if yesno "Would you like to use an existing Arch image?"
-  then
-    while true
-    do
-      echo "Existing images: "
-      echo "$(_GcloudOrErr 'gcloud compute images list')" || {
-        result="$?"
-        err "Could not get images from your project!"
-        exit $result
-      }
-      prompt "Please select an Arch image:"
-      read imgname
-      images=$(_GcloudOrErr "gcloud $_gcfmt compute images list $imgname") || {
-        result="$?"
-        err "Could not get images from your project!"
-        err "$images"
-        exit $result
-      }
-      if ! [[ "$images" == "$imgname" ]]
-      then
-        err "Existing image $imgname not found."
-        err "Please provide the name of an image in your project, or add a new image to your project."
-      else
-        pfset "$promptfile" "image" "$imgname" && echo "Image '$imgname' found."
-        break 2
-      fi
-    done
-  else
-    # TODO Support building a new image.
-    err "Building a new image is not yet supported."
-  fi
-done
 
 echo "Collected information about '$PLATFORM'!"

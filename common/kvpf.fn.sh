@@ -23,6 +23,6 @@ pfget() {
   fi
   grep -Pho "(?<=^${key}:).*$" "$file" || {  
     >&2 echo "Did not find key '$key' in promptfile '$file'."
-    exit 5
+    return 5
   }
 }
