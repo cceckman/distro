@@ -20,6 +20,7 @@ image=$(pfget "$promptfile" "image")
 echo "Creating GCE instance $instance with startup image $img"
 
 if yesno "Please confirm; you will be billed for this instance!"
+then
 	output=$(_GcloudOrErr gcloud compute instances create "$instance" \
 		--image "$image" \
 		--boot-disk-type "pd-standard" \
