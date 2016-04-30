@@ -29,10 +29,10 @@ do
   while true
   do
     # Reuse
-    v=$(pfget "$promptfile" "$key" >/dev/null 2>&1)
+    v=$(pfget "$promptfile" "$key")
     if [ $? -eq 0 ] && [ $reuse -eq 0 ]
     then
-      echo "Reusing value '$v' for '$image' from promptfile '$f'"
+      echo "Reusing value '$v' for '$key' from promptfile '$f'"
       break # inner loop; move on to next key
     fi
 
