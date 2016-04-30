@@ -20,7 +20,7 @@ echo "Storing in promptfile $promptfile."
 KEYS="configuration instance image"
 
 [ -f "$promptfile" ] && yesno "Re-use existing values from promptfile '$promptfile'?"
-resuse=$?
+reuse="$?"
 
 for key in $KEYS
 do
@@ -30,10 +30,10 @@ do
   do
     # Reuse
     v=$(pfget "$promptfile" "$key" >/dev/null 2>&1)
-    if $? && ( exit $reuse )
+    if [ $? -eq 0 ] && [ $reuse -eq 0 ]
     then
       echo "Reusing value '$v' for '$image' from promptfile '$f'"
-      break # inner loop
+      break # inner loop; move on to next key
     fi
 
     case "$key" in
@@ -47,12 +47,13 @@ do
         # Validate the configuration has the necessary properties set.
         REQPROPS="properties.core.project properties.core.account properties.compute.zone properties.compute.region"
         tmpf=$(mktemp)
-        gcloud --format=flattened configurations describe "$configuration" > $tmpf
+        gcloud --format=flattened config configurations describe "$configuration" > $tmpf
 
         problems=''
         for property in $REQPROPS
         do
-          if ! grep "^${property}:\w*[a-z]+$" $tmpf
+
+          if ! grep "^${property}:[[:space:]]*[^[:space:]]\+" $tmpf
           then
             err "Configuration $configuration doesn't have property $property set."
             problems="$problems $property"
@@ -61,20 +62,22 @@ do
 
         if [[ "$problems" == '' ]]
         then
-          echo "Configuration $configuration looks good!"
+          echo "Using configuration $configuration."
           pfset "$promptfile" configuration "$configuration"
           break
         else
-          err \
-            "Problems encountered using configuration $configuration." \
-            "Use this shell to resolve them, then try again; " \
-            "'gcloud help config configurations' may help. " \
-            "You may terminate Ambroix by exiting with a non-zero status."
-          $SHELL  || {
-            ret=$?
-            err "Shell exited with status $ret; stopping Ambroix."
-            exit $ret
-          }
+          err "Problems encountered using configuration $configuration."
+          if yesno "Open shell to fix configuration $configuration?"
+          then
+            echo "Use this shell to resolve them, then try again; " \
+              "'gcloud help config configurations' may help. " \
+              "You may terminate Ambroix by exiting with a non-zero status."
+            $SHELL  || {
+              ret=$?
+              err "Shell exited with status $ret; stopping Ambroix."
+              exit $ret
+            }
+          fi
         fi       
         ;;
 

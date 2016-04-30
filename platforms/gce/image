@@ -17,18 +17,17 @@ echo "Reading from promptfile $promptfile."
 
 instance=$(pfget "$promptfile" "instance")
 image=$(pfget "$promptfile" "image")
-echo "Creating GCE instance $instance with startup image $img"
+echo "Creating GCE instance $instance with startup image $image"
 
 if yesno "Please confirm; you will be billed for this instance!"
 then
-	output=$(_GcloudOrErr gcloud compute instances create "$instance" \
+  # Confirmed; create instance.
+	if ! _GcloudOrErr gcloud compute instances create "$instance" \
 		--image "$image" \
 		--boot-disk-type "pd-standard" \
 		--metadata-from-file startup-script=platforms/gce/firstboot
-	)
-	if ! $?
 	then
-		err "Could not create instance: $output"
+		err "Could not create instance $instance."
 		exit $?
 	fi
 else
