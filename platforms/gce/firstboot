@@ -1,0 +1,3 @@
+#!/bin/bash
+
+echo "Hi! I'm running as $USER on $(hostname)" > /tmp/checkin
