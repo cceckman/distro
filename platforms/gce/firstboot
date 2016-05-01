@@ -3,16 +3,18 @@
 output="/tmp/firstboot-output"
 source_repository="REPO" # To be substituted on imaging
 
+echo "Hi! I'm running as $(whoami) on $(hostname)." >> $output
+
 # Get source data from human
 promptfile=$(mktemp)
-echo <<EOF >$promptfile
+cat <<EOF > $promptfile
 PROMPTFILE_CONTENTS
 EOF
 
 
 # Install git
 pacman --noconfirm -Syy git || {
-  echo "Could not install git!" > $output
+  echo "Could not install git!" >> $output
   exit 1
 }
 
@@ -21,13 +23,6 @@ pacman --noconfirm -Syy git || {
     git clone http://${source_repository} -o distro \
     && popd 
 } || {
-  echo "Could not clone repository ${source_repository}!" > $output
+  echo "Could not clone repository ${source_repository}!" >> $output
   exit 2 
 }
-
-{
-  # TODO trigger platform- and user-specific startup scripts, for firstboot and firstlogin.
-}
-
-
-echo "Hi! I'm running as $USER on $(hostname)." > /tmp/checkin

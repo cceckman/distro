@@ -40,12 +40,16 @@ do
       configuration)
         echo "Here are the current named configurations for gcloud:"
         _GcloudOrErr gcloud config configurations list
-        results=$(_GcloudOrErr "gcloud $_gcfmt compute machine-types list" | sort | uniq | paste -d' ')
+        results=$(_GcloudOrErr gcloud $_gcfmt config configurations list | sort | uniq | paste -d' ')
 
         echo "Which configuration would you like to use for this project?"
         select opt in $results
         do
           configuration="$opt"
+          if [[ "$configuration" != '' ]]
+          then
+            break 
+          fi
         done
 
         # Validate the configuration has the necessary properties set.
@@ -103,20 +107,22 @@ do
         select opt in $results
         do
           machtype="$opt"
-         if [[ "$machtype" != '' ]]
+          if [[ "$machtype" != '' ]]
           then
-            echo "Using machine type $machtype"
-            pfset "$promptfile" machtype $machtype
+            break
           fi
-          break
         done
+        
+        echo "Using machine type $machtype"
+        pfset "$promptfile" machtype $machtype
+        break
         ;;
 
       instance)
         prompt "What would you like the new instance named?"
         read instance
         ## Check if there's already a machine with that name in the project.
-        instances=$(_GcloudOrErr "gcloud $_gcfmt compute instances list $instance") || {
+        instances=$(_GcloudOrErr gcloud $_gcfmt compute instances list $instance) || {
           exit $?
         }
         if [[ "$instances" == "" ]]
@@ -129,37 +135,23 @@ do
         ;;
 
       image)
-        if yesno "Would you like to use an existing Arch image?"
-        then
-          while true
-          do
-            echo "Existing images: "
-            echo "$(_GcloudOrErr 'gcloud compute images list')" || {
-              result="$?"
-              err "Could not get images from your project!"
-              exit $result
-            }
-            prompt "Please select an Arch image:"
-            read imgname
-            images=$(_GcloudOrErr "gcloud $_gcfmt compute images list $imgname") || {
-              result="$?"
-              err "Could not get images from your project!"
-              err "$images"
-              exit $result
-            }
-            if ! [[ "$images" == "$imgname" ]]
-            then
-              err "Existing image $imgname not found."
-              err "Please provide the name of an image in your project, or add a new image to your project."
-            else
-              pfset "$promptfile" "image" "$imgname" && echo "Image '$imgname' found."
-              break 2
-            fi
-          done
-        else
-          # TODO Support building a new image.
-          err "Building a new image is not yet supported."
-        fi
+        echo "Existing images: "
+        _GcloudOrErr gcloud compute images list
+        results=$(_GcloudOrErr gcloud compute images list $_gcfmt | sort | uniq)
+
+        echo "Please select an Arch image: "
+        select opt in $results
+        do
+          imgname="$opt"
+          if [[ "$imgname" != '' ]]
+          then
+            break
+          fi
+        done
+
+        echo "Using image $imgname"
+        pfset "$promptfile" image $imgname
+        break
         ;;
     esac
   done
