@@ -19,7 +19,6 @@ instance=$(pfget "$promptfile" "instance")
 image=$(pfget "$promptfile" "image")
 echo "Creating GCE instance $instance with startup image $image"
 
-
 # Insert promptfile contents into firstboot script before uploading
 firstboottmp=$(mktemp)
 sed \
@@ -27,7 +26,7 @@ sed \
     s/PROMPTFILE_CONTENTS//g
     r $promptfile
   }" \
-  -e "s/REPO/$(cat common/repo)" \
+  -e "s\"REPO\"$(cat common/repo)\"" \
   platforms/gce/firstboot > $firstboottmp
 
 if yesno "Please confirm; you will be billed for this instance!"

@@ -3,7 +3,7 @@
 PLATFORM='gce'
 
 _GcloudOrErr(){
-  results=$( $@ ) || {
+  results=$( "$@" ) || {
     ret=$?
     err "Error code $ret return from command '$1'"
     return $ret

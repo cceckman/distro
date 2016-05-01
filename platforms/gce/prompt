@@ -17,7 +17,7 @@ echo "Prompting for information about '$PLATFORM'..."
 promptfile="$1"
 echo "Storing in promptfile $promptfile."
 
-KEYS="configuration instance image"
+KEYS="configuration machtype instance image"
 
 [ -f "$promptfile" ] && yesno "Re-use existing values from promptfile '$promptfile'?"
 reuse="$?"
@@ -39,10 +39,14 @@ do
     case "$key" in
       configuration)
         echo "Here are the current named configurations for gcloud:"
-        gcloud config configurations list
+        _GcloudOrErr gcloud config configurations list
+        results=$(_GcloudOrErr "gcloud $_gcfmt compute machine-types list" | sort | uniq | paste -d' ')
 
-        prompt "Which configuration would you like to use for this project?"
-        read configuration
+        echo "Which configuration would you like to use for this project?"
+        select opt in $results
+        do
+          configuration="$opt"
+        done
 
         # Validate the configuration has the necessary properties set.
         REQPROPS="properties.core.project properties.core.account properties.compute.zone properties.compute.region"
@@ -79,6 +83,33 @@ do
             }
           fi
         fi       
+        ;;
+
+      machtype)
+        configuration=$(pfget "$promptfile" "configuration")
+        zone=$(gcloud config configurations describe --format "csv[no-heading](properties.compute.zone)" $configuration)
+
+        echo "Here are the current available machine types in zone $zone:"
+        _GcloudOrErr gcloud compute machine-types list --filter "zone = $zone"
+        results=$(_GcloudOrErr gcloud compute machine-types list --filter "zone = $zone" $_gcfmt | sort | uniq)
+
+        [[ "$results" == '' ]] && {
+          err "No machine types found for configuration $configuration!" \
+            "Re-run setup to select a new configuration."
+          exit 99
+        }
+
+        echo "Which machine type would you like to use?"
+        select opt in $results
+        do
+          machtype="$opt"
+         if [[ "$machtype" != '' ]]
+          then
+            echo "Using machine type $machtype"
+            pfset "$promptfile" machtype $machtype
+          fi
+          break
+        done
         ;;
 
       instance)

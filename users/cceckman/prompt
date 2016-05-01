@@ -1,8 +1,11 @@
 #!/bin/bash -i
 
-USER='cceckman' # Yep, overriding a builtin. Deal with it.
+if ! [[ "$TGT_USER" == "cceckman" ]]
+then
+  echo "cceckman scripts called for user $TGT_USER!"
+fi
 
-echo "Prompting for user $USER's information..."
+echo "Prompting for user $TGT_USER's information..."
 promptfile="$1"
 echo "Storing in promptfile $promptfile."
 
