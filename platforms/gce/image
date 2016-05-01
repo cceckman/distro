@@ -19,13 +19,24 @@ instance=$(pfget "$promptfile" "instance")
 image=$(pfget "$promptfile" "image")
 echo "Creating GCE instance $instance with startup image $image"
 
+
+# Insert promptfile contents into firstboot script before uploading
+firstboottmp=$(mktemp)
+sed \
+  -e "/PROMPTFILE_CONTENTS/{
+    s/PROMPTFILE_CONTENTS//g
+    r $promptfile
+  }" \
+  -e "s/REPO/$(cat common/repo)" \
+  platforms/gce/firstboot > $firstboottmp
+
 if yesno "Please confirm; you will be billed for this instance!"
 then
   # Confirmed; create instance.
 	if ! _GcloudOrErr gcloud compute instances create "$instance" \
 		--image "$image" \
 		--boot-disk-type "pd-standard" \
-		--metadata-from-file startup-script=platforms/gce/firstboot
+		--metadata-from-file startup-script=${firstboottmp}
 	then
 		err "Could not create instance $instance."
 		exit $?
