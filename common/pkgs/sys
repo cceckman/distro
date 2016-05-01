@@ -11,4 +11,5 @@ parted
 dosfstools
 ntfsprogs
 
-
+vim
+emacs
