@@ -11,7 +11,7 @@ pushd $HOME # Make sure we have a good point of reference.
 git clone git@github.com:cceckman/Tilde.git Tilde && mv Tilde/.git . && rm -rf Tilde && git reset --hard
 
 # CLONE REPOSITORIES
-# Copy down repositories I like, and
+# Copy down repositories I like / I own.
 GH_REPOS="cceckman/cce3 cceckman/distro cceckman/cceckman.github.io"
 GH_PREFIX="$HOME/r"
 GO_PREFIX="$HOME/go" # Keep in sync with Tilde/.bashrc

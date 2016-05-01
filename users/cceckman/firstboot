@@ -9,4 +9,5 @@ f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
 f=platforms/gce/helpers.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
+cat users/$TGT_USER/pkgs | xargs pacman --noconfirm -S
 

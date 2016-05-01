@@ -29,10 +29,12 @@ mkfirstboot > $firstboottmp
 if yesno "Please confirm; you will be billed for this instance!"
 then
   # Confirmed; create instance.
+  # Allow 'compute' API access so that firstboot script can remove itself.
 	if ! _GcloudOrErr gcloud compute instances create "$instance" \
 		--image "$image" \
 		--boot-disk-type "pd-standard" \
     --machine-type "$machtype" \
+    --scopes default="https://www.googleapis.com/auth/compute" \
 		--metadata-from-file startup-script=${firstboottmp}
 	then
 		err "Could not create instance $instance."

@@ -9,8 +9,19 @@ f=platforms/gce/helpers.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2
 
 # Run update.
 pacman-key --refresh-keys
-pacman -Syyu --noconfirm
+pacman --noconfirm -Syyu
 
+# TODO: Set up partitions; add swap.
+
+# Grab packages from the standard list.
+for f in $(ls common/pkgs)
+do
+  cat common/pkgs/$f | xargs pacman --noconfirm -S || {
+    ret=$?
+    echo "Could not install packages!"
+    return $ret
+  }
+done
 
 # Set locale settings
 # Ignore time zone; we run in UTC
@@ -18,12 +29,7 @@ ln -s /usr/share/zoneinfo/UTC /etc/localtime
 sed -i 's/^#en_US/en_US/' /etc/locale.gen && locale-gen
 echo LANG=en_US > /etc/locale.conf
 
-# Grab packages from the standard list.
-for f in $(ls common/pkgs)
-do
-  cat common/pkgs/$f | xargs pacman -S --noconfirm || {
-    ret=$?
-    echo "Could not install packages!"
-    return $ret
-  }
-done
+
+# Last step:remove this script from startup,
+gcloud compute instances remove-metadata $(hostname) --keys startup-script
+# TODO: Remove its permission after the fact.
