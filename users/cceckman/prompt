@@ -50,7 +50,7 @@ do
               break
             fi
           done
-          pfset "$promptfile" "authkey" "$(cat $HOME/.ssh/$authkey)"
+          pfset "$promptfile" "authkey" "$(cat $authkey)"
         else
           pfset "$promptfile" "authkey" ""
         fi
