@@ -76,6 +76,10 @@ echo "Using promptfiles:"
 echo "  plat: $PLAT_PROMPT"
 echo "  user: $USER_PROMPT"
 
+export PLAT_PROMPT
+export USER_PROMPT
+
+
 # Ensure that user and platform are present
 if (( $# != 2 ))
 then
@@ -85,7 +89,7 @@ fi
 
 export TGT_PLATFORM="$1"
 export TGT_USER="$2" # User
-STAGES="verify prompt image"
+STAGES="verify prompt image firstboot"
 
 
 ## Check for platform, platform hooks

@@ -1,0 +1,12 @@
+#!/bin/bash
+# Ambroix for GCE
+# Started on the first boot of the machine, as root.
+
+# Collect plugins
+f=common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+
+f=platforms/gce/helpers.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+
+

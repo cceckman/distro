@@ -8,6 +8,7 @@ f=common/yesno.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/prompt.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/mkfirstboot.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
 f=platforms/gce/helpers.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
@@ -22,13 +23,8 @@ echo "Creating GCE instance $instance, type $machtype, with startup image $image
 
 # Insert promptfile contents into firstboot script before uploading
 firstboottmp=$(mktemp)
-sed \
-  -e "/PROMPTFILE_CONTENTS/{
-    s/PROMPTFILE_CONTENTS//g
-    r $promptfile
-  }" \
-  -e "s?REPO?$(cat common/repo)?" \
-  platforms/gce/firstboot > $firstboottmp
+# A bit of cheating here; mkfirstboot uses PLAT_PROMPT and USER_PROMPT from ambroix.
+mkfirstboot > $firstboottmp
 
 if yesno "Please confirm; you will be billed for this instance!"
 then

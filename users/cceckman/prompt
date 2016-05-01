@@ -50,9 +50,13 @@ do
               break
             fi
           done
-          pfset "$promptfile" "authkey" "$(cat $authkey)"
+          k="$(cat $authkey)"
+          echo "Will use authorized key: $k"
+          pfset "$promptfile" "authkey" "$k"
+          break
         else
           pfset "$promptfile" "authkey" ""
+          break
         fi
         ;;
 
@@ -65,6 +69,7 @@ do
         else
           pfset "$promptfile" "genkey" "no"
         fi
+        break
         ;;
 
     esac
