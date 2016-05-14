@@ -170,6 +170,7 @@ then
   # OK with default elsewhere
 
   # Set up VirtualBox.
+  pacman-key --refresh-keys
   pacman --noconfirm -S linux-headers virtualbox-guest-utils
   systemctl enable vboxservice.service
 
