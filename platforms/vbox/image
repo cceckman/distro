@@ -4,6 +4,7 @@
 
 # Collect plugins
 f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
 promptfile="$1"
 echo "Using data from $promptfile..."
@@ -28,7 +29,7 @@ parted --script --align optimal /dev/sda -- mkpart primary linux-swap -8GiB 100%
 mkfs -t ext4 /dev/sda2 && mount /dev/sda2 /mnt || exit
 mkswap /dev/sda3 && swapon /dev/sda3 || exit
 
-# Update mirror list and package DB. This isn’t the most optimal assignment, but good enough till we get really started.
+# Update mirror list and package DB. This isn't the most optimal assignment, but good enough till we get really started.
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup # back up mirror list
 curl -o - 'https://www.archlinux.org/mirrorlist/?country=US&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on' | sed 's/#Server/Server/' > /tmp/mirrorlist
 rankmirrors -n 10 /tmp/mirrorlist > /etc/pacman.d/mirrorlist # only grab top 10 mirrors
@@ -37,4 +38,13 @@ rankmirrors -n 10 /tmp/mirrorlist > /etc/pacman.d/mirrorlist # only grab top 10 
 pacstrap /mnt base || exit
 # Wait...
 
+# Generate /etc/fstab for actual booting.
+genfstab -p /mnt >> /mnt/etc/fstab || exit
 
+pfget "$promptfile" hostname > /mnt/etc/hostname
+
+mkdir -p /mnt/tmp/ && \
+ cp platforms/vbox/image.chroot.sh /mnt/tmp/image.sh && \
+ chmod +x /mnt/tmp/image.sh && \
+  arch-chroot /mnt /tmp/image.sh
+ 

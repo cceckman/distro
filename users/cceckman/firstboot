@@ -11,3 +11,10 @@ f=platforms/gce/helpers.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2
 
 cat users/$TGT_USER/pkgs | xargs pacman --noconfirm -S
 
+# Set locale settings
+ln -s /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
+sed -i 's/^#en_US/en_US/' /etc/locale.gen && locale-gen
+echo LANG=en_US > /etc/locale.conf
+# OK with default elsewhere
+
+
