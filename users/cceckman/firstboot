@@ -17,4 +17,12 @@ sed -i 's/^#en_US/en_US/' /etc/locale.gen && locale-gen
 echo LANG=en_US > /etc/locale.conf
 # OK with default elsewhere
 
+# Start the firstlogin script on login.
+TGT_HOME=$(su -c 'echo $HOME' "$TGT_USER")
+echo <<EOF >$TGT_HOME/.profile
+#!/bin/sh
+$PWD/firstboot 2>&1 | logger && \
+  rm $TGT_HOME/.profile
+EOF
+
 

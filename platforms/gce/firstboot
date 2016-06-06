@@ -11,9 +11,12 @@ f=platforms/gce/helpers.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2
 pacman-key --refresh-keys
 pacman --noconfirm -Syyu
 
+
+echo "Firstboot for platform $PLATFORM started!" | logger
+
 # TODO: Set up partitions; add swap.
 
-# Grab packages from the standard list.
+# Grab packages from the standard list. Must include git.
 for f in $(ls common/pkgs)
 do
   cat common/pkgs/$f | xargs pacman --noconfirm -S || {
@@ -28,6 +31,8 @@ done
 ln -s /usr/share/zoneinfo/UTC /etc/localtime
 sed -i 's/^#en_US/en_US/' /etc/locale.gen && locale-gen
 echo LANG=en_US > /etc/locale.conf
+
+
 
 
 # Last step:remove this script from startup,

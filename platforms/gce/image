@@ -26,6 +26,13 @@ firstboottmp=$(mktemp)
 # A bit of cheating here; mkfirstboot uses PLAT_PROMPT and USER_PROMPT from ambroix.
 mkfirstboot > $firstboottmp
 
+# Metadata value length limit is 32768 bytes, per https://cloud.google.com/compute/docs/startupscript
+if [ $( cat $firstboottmp | wc -c) -gt 32768 ]
+then
+  err "firstboot script $firstboottmp is too long (>32768 bytes)! Aborting."
+  exit 10
+fi
+
 if yesno "Please confirm; you will be billed for this instance!"
 then
   # Confirmed; create instance.
