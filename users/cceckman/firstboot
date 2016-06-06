@@ -19,10 +19,10 @@ echo LANG=en_US > /etc/locale.conf
 
 # Start the firstlogin script on login.
 TGT_HOME=$(su -c 'echo $HOME' "$TGT_USER")
-echo <<EOF >$TGT_HOME/.profile
+cat <<EOF >$TGT_HOME/.profile
 #!/bin/sh
-$PWD/firstboot 2>&1 | logger && \
+$PWD/users/$TGT_USER/firstlogin 2>&1 && \
   rm $TGT_HOME/.profile
 EOF
-
-
+chmod +x $TGT_HOME/.profile
+chown -u ${TGT_USER}:${TGT_USER} $TGT_HOME/.profile
