@@ -25,4 +25,4 @@ $PWD/users/$TGT_USER/firstlogin 2>&1 && \
   rm $TGT_HOME/.profile
 EOF
 chmod +x $TGT_HOME/.profile
-chown -u ${TGT_USER}:${TGT_USER} $TGT_HOME/.profile
+chown ${TGT_USER}:${TGT_USER} $TGT_HOME/.profile
