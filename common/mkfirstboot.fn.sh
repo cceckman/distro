@@ -41,6 +41,11 @@ mkfirstboot () {
 	export TGT_PLATFORM="$TGT_PLATFORM"
 	cd /tmp/distro
 
+  if git branch | grep -q $(hostname)
+  then
+    git checkout $(hostname)
+  fi
+
 	{
 	  echo "Running hook 'firstboot' for platform '$TGT_PLATFORM'" >> \$output
 	  platforms/$TGT_PLATFORM/firstboot \$ppromptfile \
