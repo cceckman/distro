@@ -26,3 +26,8 @@ $PWD/users/$TGT_USER/firstlogin 2>&1 && \
 EOF
 chmod +x $TGT_HOME/.profile
 chown ${TGT_USER}:${TGT_USER} $TGT_HOME/.profile
+
+if [ -f $TGT_HOME/.bash_profile ]
+then
+  mv $TGT_HOME/.bash_profile $TGT_HOME/.bash_profile.bak
+fi
