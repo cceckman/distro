@@ -12,7 +12,7 @@ pacman-key --refresh-keys
 pacman --noconfirm -Syyu
 
 
-echo "Firstboot for platform $PLATFORM started!" | logger
+echo "Firstboot for platform $PLATFORM started!"
 
 # TODO: Set up partitions; add swap.
 

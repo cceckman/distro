@@ -48,7 +48,7 @@ mkfirstboot () {
 
 	{
 	  echo "Running hook 'firstboot' for platform '$TGT_PLATFORM'" >> \$output
-	  platforms/$TGT_PLATFORM/firstboot \$ppromptfile \
+	  platforms/$TGT_PLATFORM/firstboot \$ppromptfile 2>&1 >\$output \
 	    && echo "Hook 'firstboot' for platform '$TGT_PLATFORM' complete." \
 	    >> \$output
 	} || {
@@ -62,7 +62,7 @@ mkfirstboot () {
 	  if [ -f users/$TGT_USER/firstboot ] && [ -x users/$TGT_USER/firstboot ]
 	  then
 	    echo "Running hook 'firstboot' for user '$TGT_USER'" >> \$output
-	    users/$TGT_USER/firstboot \$upromptfile \
+	    users/$TGT_USER/firstboot \$upromptfile 2>&1 >\$output \
 	      && echo "Hook 'firstboot' for user '$TGT_USER' complete." \
 	      >> \$output
 	  else
