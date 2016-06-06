@@ -16,11 +16,15 @@ GH_REPOS="cceckman/cce3 cceckman/distro cceckman/cceckman.github.io"
 GH_PREFIX="$HOME/r"
 GO_PREFIX="$HOME/go" # Keep in sync with Tilde/.bashrc
 mkdir -p $GH_PREFIX
-mkdir $HOME/r
+mkdir -p $GO_PREFIX
+
+ret=0
+
 for repo in $GH_REPOS
 do
   REPOPATH="${GH_PREFIX}/${repo}"
   git clone "git@github.com:${repo}" "$REPOPATH"
+  ret=$(($ret + $?))
   # Support Go directory structure. Assume $HOME/go is in $GOPATH.
   GOTOOLPATH="$GO_PREFIX/src/github.com/${repo}"
   mkdir -p $(dirname $GOTOOLPATH) && ln -s $REPOPATH $GOTOOLPATH
@@ -28,3 +32,5 @@ done
 # DONE
 
 popd # $HOME
+
+exit $?
