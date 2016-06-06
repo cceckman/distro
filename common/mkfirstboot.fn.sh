@@ -41,9 +41,9 @@ mkfirstboot () {
 	export TGT_PLATFORM="$TGT_PLATFORM"
 	cd /tmp/distro
 
-  if git branch --remote | grep -q "$(hostname -a)"
+  if git branch --remote | grep -q "\$(hostname -a)"
   then
-    git checkout $(hostname -a)
+    git checkout \$(hostname -a)
   fi
 
 	{
