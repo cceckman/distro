@@ -9,6 +9,7 @@ f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
 f=platforms/gce/helpers.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
+# Install packages as root
 cat users/$TGT_USER/pkgs | xargs pacman --noconfirm -S
 
 # Set locale settings
@@ -27,7 +28,5 @@ EOF
 chmod +x $TGT_HOME/.profile
 chown ${TGT_USER}:${TGT_USER} $TGT_HOME/.profile
 
-if [ -f $TGT_HOME/.bash_profile ]
-then
-  mv $TGT_HOME/.bash_profile $TGT_HOME/.bash_profile.bak
-fi
+# Clear bash_profile.
+rm $TGT_HOME/.bash_profile
