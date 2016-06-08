@@ -51,3 +51,6 @@ else
 	err "Creating instance $instance cancelled by user."
 	exit 9
 fi
+
+echo "Great success! You can now log in: "
+gcloud compute ssh $TGT_USER@$instance -- -A
