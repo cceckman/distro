@@ -53,6 +53,6 @@ else
 fi
 
 echo "Great success! Run this command to see readiness status:"
-echo "\$ gcloud compute ssh $TGT_USER@$instance -- 'tail -f /tmp/firstboot-output' \\"
+echo "\$ gcloud compute ssh $TGT_USER@$instance -- 'tail -f /tmp/firstboot-output' "
 echo "Then this to log in:"
 echo "\$ gcloud compute ssh $TGT_USER@$instance -- -A "
