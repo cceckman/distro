@@ -34,6 +34,13 @@ do
 done
 # DONE
 
+# My magic for a random list of lowercase characters:
+# python -c 'import random; import string; ls = list(string.ascii_lowercase); random.shuffle(ls); print("".join(ls))'
+s='pmwrovsxncbtlqgdejiyahkzuf'
+a='abcdefghijklmnopqrstuvwxyz'
+git config --global user.email $(echo 'wxpjtoi@wwowblpq.wgl' | tr $s $a)
+git config --global user.name "Charles Eckman"
+
 popd # $HOME
 
 exit $?
