@@ -15,7 +15,7 @@ out=firstlogin.log
 
 # CLONE REPOSITORIES
 # Copy down repositories I like / I own.
-GH_REPOS="cceckman/cce3 cceckman/distro cceckman/cceckman.github.io"
+GH_REPOS="cceckman/cce3 cceckman/distro cceckman/cceckman.github.io ccontavali/ssh-ident"
 GH_PREFIX="$HOME/r"
 GO_PREFIX="$HOME/go" # Keep in sync with Tilde/.bashrc
 mkdir -p $GH_PREFIX
@@ -33,6 +33,9 @@ do
   mkdir -p $(dirname $GOTOOLPATH) && ln -s $REPOPATH $GOTOOLPATH
 done
 # DONE
+
+# Use ssh-ident instead of `ssh`.
+ln -s $HOME/scripts/ssh $GH_PREFIX/ccontavali/ssh-ident
 
 # My magic for a random list of lowercase characters:
 # python -c 'import random; import string; ls = list(string.ascii_lowercase); random.shuffle(ls); print("".join(ls))'
