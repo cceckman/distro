@@ -21,7 +21,7 @@ echo LANG=en_US > /etc/locale.conf
 TGT_HOME=$(su -c 'echo $HOME' "$TGT_USER")
 cat <<EOF >$TGT_HOME/.profile
 #!/bin/sh
-$PWD/users/$TGT_USER/firstlogin >$HOME/firstlogin.log 2>&1 && \
+$PWD/users/$TGT_USER/firstlogin >\$HOME/firstlogin.log 2>&1 && \
   rm $TGT_HOME/.profile
 EOF
 chmod +x $TGT_HOME/.profile
