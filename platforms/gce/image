@@ -53,4 +53,4 @@ else
 fi
 
 echo "Great success! You can now log in: "
-gcloud compute ssh $TGT_USER@$instance -- -A
+echo "gcloud compute ssh $TGT_USER@$instance -- -A"
