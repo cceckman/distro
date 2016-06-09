@@ -1,4 +1,4 @@
-#!/bin/bash -i
+#!/bin/sh -i
 # Bootstrap an Arch system.
 
 # Utilities before anything else: "print a usage message"
@@ -30,9 +30,9 @@ EOS
 }
 
 # Dependencies.
-f=common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
-f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
-f=common/yesno.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/depend.fn.sh; . $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/err.fn.sh; . $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/yesno.fn.sh; . $f || { >&2 echo "$f not found!" && exit 2; }
 
 ## Host Dependencies
 depend mktemp || usage $?
@@ -67,7 +67,7 @@ if [ -z ${USER_PROMPT+x} ]
 then
   USER_PROMPT=$(mktemp)
 fi
-if [[ "$(realpath ${PLAT_PROMPT})" == "$(realpath ${USER_PROMPT})" ]]
+if [ "$(realpath ${PLAT_PROMPT})" = "$(realpath ${USER_PROMPT})" ]
 then
   err "Cannot use the same path for user and platform promptfiles!"
   usage 1
@@ -81,7 +81,7 @@ export USER_PROMPT
 
 
 # Ensure that user and platform are present
-if (( $# != 2 ))
+if $(( $# != 2 ))
 then
   err "Wrong number of arguments"
   usage 1
@@ -93,7 +93,7 @@ STAGES="verify prompt image firstboot"
 
 
 ## Check for platform, platform hooks
-if ! [[ -d "platforms/$TGT_PLATFORM" ]]
+if ! [ -d "platforms/$TGT_PLATFORM" ]
 then
   err "Platform '$TGT_PLATFORM' not found!"
   err "Supported platforms:"
