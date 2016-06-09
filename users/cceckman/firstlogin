@@ -42,8 +42,9 @@ ln -s $GH_PREFIX/ccontavalli/ssh-ident/ssh-ident $HOME/scripts/ssh
 s='pmwrovsxncbtlqgdejiyahkzuf'
 a='abcdefghijklmnopqrstuvwxyz'
 git config --global user.email $(echo 'wxpjtoi@wwowblpq.wgl' | tr $s $a)
-git config --global user.name "Charles Eckman"
 # Yes; just obfuscated, not encrypted.
+git config --global user.name "Charles Eckman"
+git config --global diff.tool "meld"
 
 popd # $HOME
 
