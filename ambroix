@@ -81,7 +81,7 @@ export USER_PROMPT
 
 
 # Ensure that user and platform are present
-if $(( $# != 2 ))
+if [ "$#" != 2 ]
 then
   err "Wrong number of arguments"
   usage 1
