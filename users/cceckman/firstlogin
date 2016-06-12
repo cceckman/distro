@@ -44,6 +44,7 @@ a='abcdefghijklmnopqrstuvwxyz'
 git config --global user.email $(echo 'wxpjtoi@wwowblpq.wgl' | tr $s $a)
 # Yes; just obfuscated, not encrypted.
 git config --global user.name "Charles Eckman"
+git config --global core.editor "vim"
 git config --global diff.tool "meld"
 
 popd # $HOME
