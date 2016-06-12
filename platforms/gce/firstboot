@@ -4,6 +4,7 @@
 
 # Collect plugins
 f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/installpkgs.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
 f=platforms/gce/helpers.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
@@ -15,16 +16,7 @@ pacman --noconfirm -Syyu
 echo "Firstboot for platform $PLATFORM started!"
 
 # TODO: Set up partitions; add swap.
-
-# Grab packages from the standard list. Must include git.
-for f in $(ls common/pkgs)
-do
-  cat common/pkgs/$f | xargs pacman --noconfirm -S || {
-    ret=$?
-    echo "Could not install packages!"
-    return $ret
-  }
-done
+installpkgs || { >&2 echo "Could not install some packages: code $?" && exit 3; }
 
 # Set locale settings
 # Ignore time zone; we run in UTC
