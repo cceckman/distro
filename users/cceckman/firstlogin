@@ -15,8 +15,6 @@ out=firstlogin.log
 
 # CLONE REPOSITORIES
 # Copy down repositories I like / I own.
-GH_REPOS="cceckman/cce3 cceckman/web cceckman/distro cceckman/cceckman.github.io ccontavalli/ssh-ident"
-
 GH_PREFIX="$HOME/r"
 GO_PREFIX="$HOME/go" # Keep in sync with Tilde/.bashrc
 mkdir -p $GH_PREFIX
@@ -24,7 +22,7 @@ mkdir -p $GO_PREFIX
 
 ret=0
 
-for repo in $GH_REPOS
+for repo in $(cat users/$USER/repos)
 do
   REPOPATH="${GH_PREFIX}/${repo}"
   git clone "git@github.com:${repo}" "$REPOPATH"
