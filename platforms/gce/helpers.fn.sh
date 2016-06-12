@@ -1,3 +1,4 @@
+#!/bin/sh
 # Helper functions for GCE scripts.
 
 PLATFORM='gce'

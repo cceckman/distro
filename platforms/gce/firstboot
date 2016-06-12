@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/bin/sh
 # Ambroix for GCE
 # Started on the first boot of the machine, as root.
 
 # Collect plugins
-f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/kvpf.fn.sh; . $f || { >&2 echo "$f not found!" && exit 2; }
 
-f=platforms/gce/helpers.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=platforms/gce/helpers.fn.sh; . $f || { >&2 echo "$f not found!" && exit 2; }
 
 # Run update.
 pacman-key --refresh-keys
@@ -32,6 +32,8 @@ ln -s /usr/share/zoneinfo/UTC /etc/localtime
 sed -i 's/^#en_US/en_US/' /etc/locale.gen && locale-gen
 echo LANG=en_US > /etc/locale.conf
 
+
+
 # Last step:remove this script from startup,
-# gcloud compute instances remove-metadata $(hostname) --keys startup-script
+gcloud compute instances remove-metadata $(hostname) --keys startup-script
 # TODO: Remove its permission after the fact.

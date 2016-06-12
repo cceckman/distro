@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Google Compute Engine hooks.
 declare -a HOOKS
 
@@ -24,4 +24,4 @@ image() {
         --boot-disk-device-name "$name"
 }
 
-source ../platform-common.sh
+. ../platform-common.sh

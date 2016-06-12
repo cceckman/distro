@@ -1,12 +1,12 @@
-#!/bin/bash -i
+#!/bin/sh -i
 # Ambroix for GCE
 # Verify / establish a sane environment for deploying a GCE instance.
 PLATFORM='gce'
 
 echo "Checking sane host environment for platform '$PLATFORM'..."
 
-f=common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
-f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/depend.fn.sh; . $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/err.fn.sh; . $f || { >&2 echo "$f not found!" && exit 2; }
 
 # Test gcloud command
 depend gcloud || {
