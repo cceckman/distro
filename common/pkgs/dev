@@ -13,7 +13,6 @@ protobuf
 
 ghc
 cabal-install
-haddock
 happy
 alex
 
