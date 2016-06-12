@@ -7,7 +7,7 @@ f=common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
-f=platforms/gce/helpers.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/headlessvnc.fn.sh; . $f || { >&2 echo "$f not found!" && exit 2; }
 
 # Install packages as root
 cat users/$TGT_USER/pkgs | xargs pacman --noconfirm -S
@@ -30,3 +30,8 @@ chown ${TGT_USER}:${TGT_USER} $TGT_HOME/.profile
 
 # Clear bash_profile.
 rm $TGT_HOME/.bash_profile
+
+# Set up VNC
+headlessvnc
+# And allow linger for it
+loginctl enable-linger $TGT_USER
