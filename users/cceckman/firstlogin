@@ -34,8 +34,8 @@ do
 done
 # DONE
 
-# Use ssh-ident instead of `ssh`.
-ln -s $GH_PREFIX/ccontavalli/ssh-ident/ssh-ident $HOME/scripts/ssh 
+# Link for ssh-ident.
+ln -s $GH_PREFIX/ccontavalli/ssh-ident/ssh-ident $HOME/scripts/sshi
 
 # My magic for a random list of lowercase characters:
 # python -c 'import random; import string; ls = list(string.ascii_lowercase); random.shuffle(ls); print("".join(ls))'
