@@ -15,7 +15,7 @@ out=firstlogin.log
 
 # CLONE REPOSITORIES
 # Copy down repositories I like / I own.
-GH_REPOS="cceckman/cce3 cceckman/web cceckman/distro cceckman/cceckman.github.io ccontavali/ssh-ident"
+GH_REPOS="cceckman/cce3 cceckman/web cceckman/distro cceckman/cceckman.github.io ccontavalli/ssh-ident"
 GH_PREFIX="$HOME/r"
 GO_PREFIX="$HOME/go" # Keep in sync with Tilde/.bashrc
 mkdir -p $GH_PREFIX
