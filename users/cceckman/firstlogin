@@ -2,6 +2,8 @@
 # firstlogin for cceckman. Set up home, etc.
 # This should mostly / probably work on platforms other than Arch.
 
+repos="$(cat users/$USER/repos)"
+
 pushd $HOME # Make sure we have a good point of reference.
 
 out=firstlogin.log
@@ -22,7 +24,7 @@ mkdir -p $GO_PREFIX
 
 ret=0
 
-for repo in $(cat users/$USER/repos)
+for repo in "$repos"
 do
   REPOPATH="${GH_PREFIX}/${repo}"
   git clone "git@github.com:${repo}" "$REPOPATH"
