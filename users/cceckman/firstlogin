@@ -24,7 +24,7 @@ mkdir -p $GO_PREFIX
 
 ret=0
 
-for repo in "$repos"
+for repo in $repos
 do
   REPOPATH="${GH_PREFIX}/${repo}"
   git clone "git@github.com:${repo}" "$REPOPATH"
