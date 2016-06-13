@@ -25,5 +25,8 @@ sed -i 's/^#en_US/en_US/' /etc/locale.gen && locale-gen
 echo LANG=en_US > /etc/locale.conf
 
 # Last step:remove this script from startup,
-gcloud compute instances remove-metadata $(hostname -s) --keys startup-script
+zonestr=$(curl -L -H 'Metadata-Flavor:Google' http://metadata.google.internal/computeMetadata/v1/instance/zone)
+project=$(echo "$zonestr" | sed 's:^.*projects/\([^/]*\).*$:\1:')
+zone=$(echo "$zonestr" | sed 's:^.*zones/\([^/]*\).*$:\1:')
+gcloud compute instances remove-metadata --zone="/$project/$zone" $(hostname -s) --keys startup-script
 # TODO: Remove its permission after the fact.
