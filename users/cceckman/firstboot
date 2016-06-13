@@ -8,6 +8,8 @@ f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
 f=common/headlessvnc.fn.sh; . $f || { >&2 echo "$f not found!" && exit 2; }
+f=platforms/gce/helpers.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/dockersetup.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
 # Install packages as root
 cat users/$TGT_USER/pkgs | xargs pacman --noconfirm -S
@@ -29,6 +31,9 @@ popd
 EOF
 chmod +x $TGT_HOME/.profile
 chown ${TGT_USER}:${TGT_USER} $TGT_HOME/.profile
+
+# Set up docker.
+dockersetup
 
 # Clear bash_profile.
 rm $TGT_HOME/.bash_profile
