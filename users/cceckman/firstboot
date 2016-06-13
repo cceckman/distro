@@ -23,8 +23,8 @@ TGT_HOME=$(su -c 'echo $HOME' "$TGT_USER")
 cat <<EOF >$TGT_HOME/.profile
 #!/bin/sh
 pushd $PWD
-users/$TGT_USER/firstlogin >\$HOME/firstlogin.log 2>&1 && \
-  $TGT_HOME/.profile
+users/$TGT_USER/firstlogin >\$HOME/firstlogin.log 2>&1 \
+  && mv $TGT_HOME/.profile $TGT_HOME/.profile.disabled
 popd
 EOF
 chmod +x $TGT_HOME/.profile
