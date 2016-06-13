@@ -24,7 +24,7 @@ cat <<EOF >$TGT_HOME/.profile
 #!/bin/sh
 pushd $PWD
 users/$TGT_USER/firstlogin >\$HOME/firstlogin.log 2>&1 && \
-  rm $TGT_HOME/.profile
+  $TGT_HOME/.profile
 popd
 EOF
 chmod +x $TGT_HOME/.profile
