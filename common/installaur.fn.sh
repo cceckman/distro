@@ -13,7 +13,7 @@ installyaourt() {
 
 installaur() {
   installyaourt || return $?
-  for f in $(ls common/aur)
+  for f in "$@"
   do
     cat common/aur/$f | fmt | xargs yaourt --noconfirm -S || {
       ret=$?

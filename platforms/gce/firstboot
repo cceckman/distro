@@ -5,7 +5,6 @@
 # Collect plugins
 f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/installpkgs.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
-f=common/installaur.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=platforms/gce/helpers.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
 # Run update.
@@ -16,7 +15,7 @@ echo "Firstboot for platform $PLATFORM started!"
 
 # TODO: Set up partitions; add swap.
 installpkgs || { >&2 echo "Could not install some packages: code $?" && exit 3; }
-installaur || { >&2 echo "Could not install some AUR packages: code $?" && exit 3; }
+
 
 # Set locale settings
 # Ignore time zone; we run in UTC
