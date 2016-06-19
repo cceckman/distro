@@ -2,8 +2,6 @@
 # firstlogin for cceckman. Set up home, etc.
 # This should mostly / probably work on platforms other than Arch.
 
-repos="$(cat users/$USER/repos)"
-
 pushd $HOME # Make sure we have a good point of reference.
 
 out=firstlogin.log
@@ -15,28 +13,9 @@ out=firstlogin.log
 (git clone git@github.com:cceckman/Tilde.git Tilde >$out 2>&1 || exit $? ) && \
   mv Tilde/.git . && rm -rf Tilde && git reset --hard
 
-# CLONE REPOSITORIES
-# Copy down repositories I like / I own.
-GH_PREFIX="$HOME/r"
-GO_PREFIX="$HOME/go" # Keep in sync with Tilde/.bashrc
-mkdir -p $GH_PREFIX
-mkdir -p $GO_PREFIX
+# And then use the acquired script to get the latest.
+scripts/update-repos || exit $?
 
-ret=0
-
-for repo in $repos
-do
-  REPOPATH="${GH_PREFIX}/${repo}"
-  git clone "git@github.com:${repo}" "$REPOPATH"
-  ret=$(($ret + $?))
-  # Support Go directory structure. Assume $HOME/go is in $GOPATH.
-  GOTOOLPATH="$GO_PREFIX/src/github.com/${repo}"
-  mkdir -p $(dirname $GOTOOLPATH) && ln -s $REPOPATH $GOTOOLPATH
-done
-# DONE
-
-# Link for ssh-ident.
-ln -s $GH_PREFIX/ccontavalli/ssh-ident/ssh-ident $HOME/scripts/sshi
 
 # My magic for a random list of lowercase characters:
 # python -c 'import random; import string; ls = list(string.ascii_lowercase); random.shuffle(ls); print("".join(ls))'
