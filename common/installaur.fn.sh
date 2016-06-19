@@ -13,7 +13,10 @@ installyaourt() {
 
 installaur() {
   installyaourt || return $?
-  yaourt --noconfirm -S "$@" || {
+  # /tmp is on tmpfs, which gets filled up pretty quick on GCE.
+  builddir="$HOME/tmp"
+  mkdir $builddir
+  yaourt --tmp "$builddir" --noconfirm -S "$@" || {
     ret=$?
     echo "Could not install AUR packages!"
     return $ret
