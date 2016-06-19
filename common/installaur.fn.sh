@@ -13,12 +13,9 @@ installyaourt() {
 
 installaur() {
   installyaourt || return $?
-  for f in "$@"
-  do
-    cat common/aur/$f | fmt | xargs yaourt --noconfirm -S || {
-      ret=$?
-      echo "Could not install AUR package!"
-      return $ret
-    }
-  done
+  yaourt --noconfirm -S "$@" || {
+    ret=$?
+    echo "Could not install AUR packages!"
+    return $ret
+  }
 }
