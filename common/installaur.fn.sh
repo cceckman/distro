@@ -15,9 +15,9 @@ installaur() {
   installyaourt || return $?
   for f in $(ls common/aur)
   do
-    cat common/aur/$f | sed '/^\s*$/d' | xargs yaourt --noconfirm -S || {
+    cat common/aur/$f | fmt | xargs yaourt --noconfirm -S || {
       ret=$?
-      echo "Could not install packages!"
+      echo "Could not install AUR package!"
       return $ret
     }
   done

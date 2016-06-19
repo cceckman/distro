@@ -14,7 +14,7 @@ out=firstlogin.log
   mv Tilde/.git . && rm -rf Tilde && git reset --hard
 
 # And then use the acquired script to get the latest.
-scripts/update-repos || exit $?
+$HOME/scripts/update-repos || exit $?
 
 
 # My magic for a random list of lowercase characters:
