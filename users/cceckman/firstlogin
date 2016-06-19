@@ -4,7 +4,7 @@
 
 # Install AUR packages as user, so that we aren't installing as root.
 f=common/installaur.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
-installaur $(cat user/$USER/aurpkgs) || {
+installaur $(cat users/$USER/aurpkgs) || {
   >&2 echo "Could not install some AUR packages: code $?" && exit 3;
 }
 
