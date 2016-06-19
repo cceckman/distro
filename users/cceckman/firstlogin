@@ -11,7 +11,8 @@ out=firstlogin.log
 
 # Tilde repository gets special treatment.
 (git clone git@github.com:cceckman/Tilde.git Tilde >$out 2>&1 || exit $? ) && \
-  mv Tilde/.git . && rm -rf Tilde && git reset --hard
+  mv Tilde/.git . && rm -rf Tilde && git reset --hard && \
+  git submodule update --recursive --init
 
 # And then use the acquired script to get the latest.
 $HOME/scripts/update-repos || exit $?
