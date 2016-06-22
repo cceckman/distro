@@ -60,8 +60,7 @@ do
           err "$disk doesn't match expected pattern /dev/sd[a-z]"
           continue
         fi
-
-        echo "$disk looks good"
+        pfset "$promptfile" disk "$disk" && echo "OK, using $disk."
         break
         ;;
     esac
