@@ -1,7 +1,9 @@
 # mkfirstboot: make a firstboot script.
 
+_REPO="$(cat common/repo)"
+
 mkfirstboot () {
-  local REPO="$(cat common/repo)"
+  local REPO="$_REPO"
 
   cat <<-QDF
 	output="/tmp/firstboot-output"
