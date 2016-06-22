@@ -40,5 +40,9 @@ mkfs.ext4 "${disk}2" && mount  "${disk}2" /mnt/root
 wait
 # Wait for download to complete
 bsdtar -xpf /tmp/download/arch-rpi.tar.gz -C /mnt/root
+
 mv /mnt/root/boot/* /mnt/boot
+
+common/image.setfirstboot.sh /mnt/root
+
 sync

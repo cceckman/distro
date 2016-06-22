@@ -8,7 +8,6 @@ f=common/yesno.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/prompt.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
-f=common/mkfirstboot.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
 echo "Creating usable image for '$PLATFORM'..."
 promptfile="$1"
@@ -31,14 +30,9 @@ then
   exit 9
 fi
 
-sudo image.root.sh || {
-  err "Return code $? from image.root.sh."
+sudo image.sudo.sh || {
+  err "Return code $? from image.sudo.sh."
 }
-
-# Insert promptfile contents into firstboot script before uploading
-firstboottmp=$(mktemp)
-# A bit of cheating here; mkfirstboot uses PLAT_PROMPT and USER_PROMPT from ambroix.
-mkfirstboot > $firstboottmp
 
 sync
 umount /mnt/boot
