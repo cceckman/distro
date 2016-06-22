@@ -49,7 +49,7 @@ do
       disk)
         prompt "What block device is the Raspberry Pi's SD card?"
         read disk
-        if ! [ -d "$disk" ]
+        if ! [ -b "$disk" ]
         then
           err "$disk doesn't look like a block device."
           continue
