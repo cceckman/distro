@@ -1,0 +1,24 @@
+#!/bin/bash -i
+# Ambroix for GCE
+# Verify / establish a sane environment for deploying a GCE instance.
+PLATFORM='rpi3'
+
+echo "Checking sane host environment for platform '$PLATFORM'..."
+
+f=common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+
+depend curl || {
+  err "curl command isn't installed"
+  exit 3;
+}
+
+depend bsdtar || {
+  err "curl command isn't installed"
+  exit 3;
+}
+
+# Later on (in `prompt`), we'll want to check that the gcloud configuration is
+# correct & filled appropriately.
+
+echo "Environment for platform '$PLATFORM' appears sane!"
