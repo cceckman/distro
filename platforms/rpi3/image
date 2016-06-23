@@ -34,6 +34,3 @@ sudo platforms/$TGT_PLATFORM/image.sudo.sh "$disk" "$hostname" || {
   err "Return code $? from image.sudo.sh."
 }
 
-sync
-umount /mnt/boot
-umount /mnt/root

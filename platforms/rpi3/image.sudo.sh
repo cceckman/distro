@@ -56,3 +56,8 @@ echo "Done!"
 echo "Syncing filesystem to media..."
 sync
 echo "Done!"
+
+echo "Unmounting..."
+umount /mnt/boot
+umount /mnt/root
+echo "Done!"
