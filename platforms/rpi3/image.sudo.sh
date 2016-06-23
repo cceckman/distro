@@ -44,13 +44,19 @@ echo "Waiting for image download to complete..."
 wait
 echo "Done!"
 
-echo "Copying image to /mnt/root and /mnt/boot..."
+echo "Copying image to /mnt/root..."
 bsdtar -xpf $IMGPATH -C /mnt/root
-mv /mnt/root/boot/* /mnt/boot
-echo "Done~"
+echo "Done!"
+
+# TODO install qemu, etc., run some commands within chroot.
+# https://wiki.archlinux.org/index.php/Raspberry_Pi#QEMU_chroot
 
 echo "Setting up first-boot behavior..."
 common/image.setfirstboot.sh /mnt/root
+echo "Done!"
+
+echo "Copying to /mnt/boot..."
+mv /mnt/root/boot/* /mnt/boot
 echo "Done!"
 
 echo "Syncing filesystem to media..."
