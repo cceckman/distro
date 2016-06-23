@@ -20,6 +20,6 @@ mkfirstboot > "${MOUNT}${binpath}"
 chmod +x "${MOUNT}${binpath}"
 
 mkdir ${MOUNT}/etc/systemd/system-preset/
-cat <<EOF >${MOUNT}/etc/systemd/system-preset/50-ambroix.service
+cat <<EOF >${MOUNT}/etc/systemd/system-preset/50-ambroix.preset
 enable ambroix.service
 EOF
