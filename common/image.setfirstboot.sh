@@ -15,9 +15,11 @@ Requires=network.target
 Type=oneshot
 ExecStart=$binpath
 EOF
+
 mkfirstboot > "${MOUNT}${binpath}"
 chmod +x "${MOUNT}${binpath}"
 
+mkdir ${MOUNT}/etc/systemd/system-preset/
 cat <<EOF >${MOUNT}/etc/systemd/system-preset/50-ambroix.service
 enable ambroix.service
-disable *
+EOF
