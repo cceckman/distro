@@ -9,7 +9,7 @@ binpath=/usr/bin/firstboot.sh
 mkdir "${MOUNT}${servicepath}"
 cat <<EOF >${MOUNT}/etc/systemd/system/ambroix.service
 [Unit]
-Description=Set up Ambroix install (http://cceckman.com/r/distro)
+Description=Distribution first-boot
 Requires=network.target
 [Service]
 Type=oneshot
@@ -21,7 +21,10 @@ EOF
 mkfirstboot > "${MOUNT}${binpath}"
 chmod +x "${MOUNT}${binpath}"
 
+# Set it to run
 mkdir ${MOUNT}/etc/systemd/system-preset/
 cat <<EOF >${MOUNT}/etc/systemd/system-preset/50-ambroix.preset
 enable ambroix.service
 EOF
+# Above only works with 'systemctl preset'; link as well
+ln -s /etc/systemd/system/ambroix.service ${MOUNT}/etc/systemd/system/multi-user.target.wants/ambroix.service
