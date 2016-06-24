@@ -69,9 +69,7 @@ umount /mnt/root
 echo "Done!"
 
 echo "Checking filesystems..."
-{
-  fsck "${disk}1" && fsck "${disk}2" \
-} || {
+{ fsck "${disk}1" && fsck "${disk}2" } || {
   echo "Filesystem check failed!"
   exit 9
 }
