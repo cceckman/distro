@@ -6,11 +6,12 @@ f=common/mkfirstboot.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 MOUNT="$1"
 
 binpath=/usr/bin/firstboot.sh
-mkdir "${MOUNT}${servicepath}"
+mkdir -p "${MOUNT}/etc/systemd/system"
 cat <<EOF >${MOUNT}/etc/systemd/system/ambroix.service
 [Unit]
 Description=Distribution first-boot
 Requires=network.target
+Support=http://cceckman.com/r/distro
 [Service]
 Type=oneshot
 ExecStart=$binpath
