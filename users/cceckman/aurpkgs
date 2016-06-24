@@ -1,4 +1,2 @@
 universal-ctags-git
 bazel
-binfmt-support
-qemu-user-static
