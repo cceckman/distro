@@ -14,6 +14,8 @@ Requires=network.target
 [Service]
 Type=oneshot
 ExecStart=$binpath
+[Install]
+WantedBy=multi-user.target
 EOF
 
 mkfirstboot > "${MOUNT}${binpath}"
