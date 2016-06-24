@@ -6,6 +6,7 @@ mkfirstboot () {
   local REPO="$_REPO"
 
   cat <<-QDF
+  #!/usr/bin/env bash
 	output="/tmp/firstboot-output"
 
 	echo "Hi! I'm running as \$(whoami) on \$(hostname)." >> \$output
