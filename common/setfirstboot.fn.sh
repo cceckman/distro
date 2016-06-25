@@ -12,7 +12,7 @@ setfirstboot() {
   cat <<EOF >${MOUNT}/etc/systemd/system/ambroix.service
 [Unit]
 Description=Distribution first-boot
-Requires=network.target
+Requires=network-online.target
 Support=http://cceckman.com/r/distro
 [Service]
 Type=oneshot

@@ -14,12 +14,12 @@ echo "Hi! I'm running as \$(whoami) on \$(hostname)." >> \$output
 # Get source data from human
 ppromptfile=\$(mktemp)
 cat <<-EOF > \$ppromptfile
-$PLAT_PROMPT
+$(cat $PLAT_PROMPT | sed 's/EOF/XOF/g')
 EOF
 
 upromptfile=\$(mktemp)
 cat <<-EOF > \$upromptfile
-$USER_PROMPT
+$(cat $USER_PROMPT | sed 's/EOF/XOF/g')
 EOF
 
 
