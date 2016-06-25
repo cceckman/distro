@@ -1,6 +1,9 @@
 #!/bin/bash
 # run-as-root portion of setting up image.
 
+f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/setfirstboot.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+
 # TODO trap
 set -e
 
@@ -67,7 +70,7 @@ echo "Done!"
 # https://wiki.archlinux.org/index.php/Raspberry_Pi#QEMU_chroot
 
 echo "Setting up first-boot behavior..."
-common/image.setfirstboot.sh /mnt/root || {
+setfirstboot /mnt/root || {
   echo "Could not set up boot behavior!" && exit 6
 }
 echo "Done!"
