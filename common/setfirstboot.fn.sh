@@ -8,11 +8,11 @@ setfirstboot() {
   MOUNT="$1"
   binpath=/usr/bin/firstboot.sh
   mkdir -p "${MOUNT}/etc/systemd/system"
-  # NB: Tabs, not spaces, in the heredoc below!
   cat <<EOF >${MOUNT}/etc/systemd/system/ambroix.service
 [Unit]
 Description=Distribution first-boot
 Requires=network-online.target
+After=network-online.target
 Support=http://cceckman.com/r/distro
 [Service]
 Type=oneshot
