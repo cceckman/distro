@@ -1,0 +1,71 @@
+#!/bin/bash -i
+# Ambroix for Raspberry Pi
+# Prompt for local and remote settings.
+
+# Collect plugins
+f=common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/yesno.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/prompt.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+
+# TODO: Recover and verify information from an existing promptfile.
+
+echo "Prompting for information about '$TGT_PLATFORM'..."
+promptfile="$1"
+echo "Storing in promptfile $promptfile."
+
+KEYS="hostname disk"
+
+[ -f "$promptfile" ] && yesno "Re-use existing values from promptfile '$promptfile'?"
+reuse="$?"
+
+for key in $KEYS
+do
+  # For each key, loop through until it gives a satisfactory result.
+  # "satisfactory result" is indicated by 'break'.
+  while true
+  do
+    # Reuse
+    v=$(pfget "$promptfile" "$key")
+    if [ $? -eq 0 ] && [ $reuse -eq 0 ]
+    then
+      echo "Reusing value '$v' for '$key' from promptfile '$f'"
+      break # inner loop; move on to next key
+    fi
+
+    case "$key" in
+      hostname)
+        prompt "What would you like the device named (hostname)?"
+        read hostname
+        if [[ "$hostname" != "" ]]
+        then
+          pfset "$promptfile" "hostname" "$hostname" && echo "Name '$hostname' OK."
+          break
+        else
+          err "Please provide a hostname."
+        fi
+        ;;
+      disk)
+        prompt "What block device is the Raspberry Pi's SD card?"
+        read disk
+        if ! [ -b "$disk" ]
+        then
+          err "$disk doesn't look like a block device."
+          continue
+        fi
+
+        if ! echo "$disk" | grep '^/dev/sd[a-z]$'
+        then
+          err "$disk doesn't match expected pattern /dev/sd[a-z]"
+          continue
+        fi
+        pfset "$promptfile" disk "$disk" && echo "OK, using $disk."
+        break
+        ;;
+    esac
+  done
+done
+
+
+echo "Collected information about '$PLATFORM'!"

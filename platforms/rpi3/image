@@ -1,0 +1,36 @@
+#!/bin/bash -i
+# Ambroix for RPI 3.
+# Write the disk image.
+
+# Collect plugins
+f=common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/yesno.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/prompt.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+
+echo "Creating usable image for '$PLATFORM'..."
+promptfile="$1"
+echo "Reading from promptfile $promptfile."
+
+hostname=$(pfget "$promptfile" "hostname")
+disk=$(pfget "$promptfile" "disk")
+echo "Creating RPi 3 image with hostname $hostname on disk $disk"
+
+if df | grep "$disk"
+then
+  err "Oh noes! $disk is currently mounted. Aborting; please unmount "\
+    "if it's safe to do so, or pick a different address."
+  exit 6
+fi
+
+if ! yesno "About to ovewrite $disk with Arch Linux; OK to continue?"
+then
+  err "Aborted by user."
+  exit 9
+fi
+
+sudo platforms/$TGT_PLATFORM/image.sudo.sh "$disk" "$hostname" || {
+  err "Return code $? from image.sudo.sh."
+}
+

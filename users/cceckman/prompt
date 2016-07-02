@@ -1,8 +1,11 @@
 #!/bin/bash -i
 
-USER='cceckman' # Yep, overriding a builtin. Deal with it.
+if ! [[ "$TGT_USER" == "cceckman" ]]
+then
+  echo "cceckman scripts called for user $TGT_USER!"
+fi
 
-echo "Prompting for user $USER's information..."
+echo "Prompting for user $TGT_USER's information..."
 promptfile="$1"
 echo "Storing in promptfile $promptfile."
 
@@ -14,8 +17,64 @@ f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/prompt.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
-# Module for asking about key additions.
-f=common/keys/prompt; source $f || { >&2 echo "$f not found!" && exit 2; }
-# Use corresponding common/keys hooks later to unpack.
+KEYS="authkey genkey"
 
-# TODO: Recover and verify information from an existing promptfile.
+[ -f "$promptfile" ] && yesno "Re-use existing values from promptfile '$promptfile'?"
+reuse="$?"
+
+for key in $KEYS
+do
+  # For each key, loop through until it gives a satisfactory result.
+  # "satisfactory result" is indicated by 'break'.
+  while true
+  do
+    # Reuse
+    v=$(pfget "$promptfile" "$key")
+    if [ $? -eq 0 ] && [ $reuse -eq 0 ]
+    then
+      echo "Reusing value '$v' for '$key' from promptfile '$f'"
+      break # inner loop; move on to next key
+    fi
+
+    case "$key" in
+
+      authkey)
+        if yesno "Upload an authorized SSH key?"
+        then
+          echo "Which pubkey would you like to upload?"
+          select opt in $(ls $HOME/.ssh/*.pub)
+          do
+            authkey="$opt"
+            if [[ "$authkey" != '' ]]
+            then
+              break
+            fi
+          done
+          k="$(cat $authkey)"
+          echo "Will use authorized key: $k"
+          pfset "$promptfile" "authkey" "$k"
+          break
+        else
+          pfset "$promptfile" "authkey" ""
+          break
+        fi
+        ;;
+
+      genkey)
+        if yesno "Generate new SSH keys on the target machine?" \
+          "Note: you should only do this if you are using this machine " \
+          "directly, not via SSH."
+        then
+          pfset "$promptfile" "genkey" "yes"
+        else
+          pfset "$promptfile" "genkey" "no"
+        fi
+        break
+        ;;
+
+    esac
+  done
+done
+
+
+echo "Collected information about '$TGT_USER'!"

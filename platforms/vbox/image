@@ -1,0 +1,50 @@
+#!/bin/bash -i
+# Ambroix for VirtualBox
+# Image the target machine.
+
+# Collect plugins
+f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+
+promptfile="$1"
+echo "Using data from $promptfile..."
+
+set -e
+for sig in INT TERM EXIT; do
+  trap "echo 'Encountered an error! Dropping into bash.' && bash; [[ $sig == EXIT ]] || (trap - $sig EXIT; kill -$sig $$)" $sig 
+done
+
+set -x
+
+# Turn on some base services: 
+timedatectl set-ntp true # enable NTP-based time.
+
+# Set up the disk: use GPT (rather than MBR); leave 1MiB for GRUB; and leave 8GB for swap.
+parted --script /dev/sda mklabel gpt || exit
+parted --script --align optimal /dev/sda -- mkpart primary 0% 1M set 1 bios_grub on name 1 grub || exit
+parted --script --align optimal /dev/sda -- mkpart primary ext4 1M -8GiB name 2 root || exit
+parted --script --align optimal /dev/sda -- mkpart primary linux-swap -8GiB 100% name 3 swap || exit
+
+# Format root partition and swap
+mkfs -t ext4 /dev/sda2 && mount /dev/sda2 /mnt || exit
+mkswap /dev/sda3 && swapon /dev/sda3 || exit
+
+# Update mirror list and package DB. This isn't the most optimal assignment, but good enough till we get really started.
+cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup # back up mirror list
+curl -o - 'https://www.archlinux.org/mirrorlist/?country=US&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on' | sed 's/#Server/Server/' > /tmp/mirrorlist
+rankmirrors -n 10 /tmp/mirrorlist > /etc/pacman.d/mirrorlist # only grab top 10 mirrors
+
+# Install...
+pacstrap /mnt base || exit
+# Wait...
+
+# Generate /etc/fstab for actual booting.
+genfstab -p /mnt >> /mnt/etc/fstab || exit
+
+pfget "$promptfile" hostname > /mnt/etc/hostname
+
+mkdir -p /mnt/tmp/ && \
+ cp platforms/vbox/image.chroot.sh /mnt/tmp/image.sh && \
+ chmod +x /mnt/tmp/image.sh && \
+  arch-chroot /mnt /tmp/image.sh
+ 

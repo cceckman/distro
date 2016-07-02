@@ -77,10 +77,10 @@ already be populated; hooks should be aware of this, and allow the user to
 bypass prompts that are already answered; they should also ensure that the
 provided promptfile is actually for the correct platform/user.
 
-Note the implications of the above:
-- The 'platform' and 'user' parameters implied by the user running the script
-  aren't explicitly passed to the hook.
-- Platform hooks don't know the user, and user hooks don't know the platform.
+The environment variables `TGT_PLATFORM` and `TGT_USER` are set when calling
+hooks. Hooks generally shouldn't make assumptions or conditions based on these;
+however, some segments of code (e.g. [mkfirstboot](common/mkfirstboot.sh)) may
+require them.
 
 ### Common code
 Since many platforms will share the same code, the [common](common/) directory

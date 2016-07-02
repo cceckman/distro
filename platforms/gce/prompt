@@ -13,84 +13,149 @@ f=platforms/gce/helpers.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2
 
 # TODO: Recover and verify information from an existing promptfile.
 
-echo "Prompting for information about '$PLATFORM'..."
+echo "Prompting for information about '$TGT_PLATFORM'..."
 promptfile="$1"
 echo "Storing in promptfile $promptfile."
 
-while true
-do
-  echo "Here are the current named configurations for gcloud:"
-  gcloud config configurations list
+KEYS="configuration machtype instance image"
 
-  if yesno "Is the one you want to use active?"
-  then
-    # TODO: Perform validation, e.g. that fields are populated;
-    # Break (only) on success.
-    break
-  fi
-  echo "Please use this shell to generate and activate a gcloud configuration" \
-    "to use for Ambroix. "
-  echo "'gcloud help config configurations' may help."
-  echo "You may terminate Ambroix by exiting with a non-zero status."
-  $SHELL  || {
-    ret=$?
-    err "Shell exited with status $ret; stopping Ambroix."
-    exit $ret
-  }
+[ -f "$promptfile" ] && yesno "Re-use existing values from promptfile '$promptfile'?"
+reuse="$?"
+
+for key in $KEYS
+do
+  # For each key, loop through until it gives a satisfactory result.
+  # "satisfactory result" is indicated by 'break'.
+  while true
+  do
+    # Reuse
+    v=$(pfget "$promptfile" "$key")
+    if [ $? -eq 0 ] && [ $reuse -eq 0 ]
+    then
+      echo "Reusing value '$v' for '$key' from promptfile '$f'"
+      break # inner loop; move on to next key
+    fi
+
+    case "$key" in
+      configuration)
+        echo "Here are the current named configurations for gcloud:"
+        _GcloudOrErr gcloud config configurations list
+        results=$(_GcloudOrErr gcloud $_gcfmt config configurations list | sort | uniq | paste -d' ')
+
+        echo "Which configuration would you like to use for this project?"
+        select opt in $results
+        do
+          configuration="$opt"
+          if [[ "$configuration" != '' ]]
+          then
+            break 
+          fi
+        done
+
+        # Validate the configuration has the necessary properties set.
+        REQPROPS="properties.core.project properties.core.account properties.compute.zone properties.compute.region"
+        tmpf=$(mktemp)
+        gcloud --format=flattened config configurations describe "$configuration" > $tmpf
+
+        problems=''
+        for property in $REQPROPS
+        do
+
+          if ! grep "^${property}:[[:space:]]*[^[:space:]]\+" $tmpf
+          then
+            err "Configuration $configuration doesn't have property $property set."
+            problems="$problems $property"
+          fi
+        done
+
+        if [[ "$problems" == '' ]]
+        then
+          echo "Using configuration $configuration."
+          pfset "$promptfile" configuration "$configuration"
+          break
+        else
+          err "Problems encountered using configuration $configuration."
+          if yesno "Open shell to fix configuration $configuration?"
+          then
+            echo "Use this shell to resolve them, then try again; " \
+              "'gcloud help config configurations' may help. " \
+              "You may terminate Ambroix by exiting with a non-zero status."
+            $SHELL  || {
+              ret=$?
+              err "Shell exited with status $ret; stopping Ambroix."
+              exit $ret
+            }
+          fi
+        fi       
+        ;;
+
+      machtype)
+        configuration=$(pfget "$promptfile" "configuration")
+        zone=$(gcloud config configurations describe --format "csv[no-heading](properties.compute.zone)" $configuration)
+
+        echo "Here are the current available machine types in zone $zone:"
+        _GcloudOrErr gcloud compute machine-types list --filter "zone = $zone"
+        results=$(_GcloudOrErr gcloud compute machine-types list --filter "zone = $zone" $_gcfmt | sort | uniq)
+
+        [[ "$results" == '' ]] && {
+          err "No machine types found for configuration $configuration!" \
+            "Re-run setup to select a new configuration."
+          exit 99
+        }
+
+        echo "Which machine type would you like to use?"
+        select opt in $results
+        do
+          machtype="$opt"
+          if [[ "$machtype" != '' ]]
+          then
+            break
+          fi
+        done
+        
+        echo "Using machine type $machtype"
+        pfset "$promptfile" machtype $machtype
+        break
+        ;;
+
+      instance)
+        prompt "What would you like the new instance named?"
+        read instance
+        ## Check if there's already a machine with that name in the project.
+        instances=$(_GcloudOrErr gcloud $_gcfmt compute instances list $instance) || {
+          exit $?
+        }
+        if [[ "$instances" == "" ]]
+        then
+          pfset "$promptfile" "instance" "$instance" && echo "Instance '$instance' OK."
+          break
+        else
+          err "Machine name '$instance' appears to be in use. Please select another."
+        fi
+        ;;
+
+      image)
+        echo "Existing images: "
+        _GcloudOrErr gcloud compute images list
+        results=$(_GcloudOrErr gcloud compute images list $_gcfmt | sort | uniq)
+
+        echo "Please select an Arch image: "
+        select opt in $results
+        do
+          imgname="$opt"
+          if [[ "$imgname" != '' ]]
+          then
+            break
+          fi
+        done
+
+        echo "Using image $imgname"
+        pfset "$promptfile" image $imgname
+        break
+        ;;
+    esac
+  done
 done
 
-# Machine name
-while true
-do
-  prompt "What would you like the new instance named?"
-  read instance
-  ## Check if there's already a machine with that name in the project.
-  instances=$(_GcloudOrErr "gcloud $_gcfmt compute instances list $instance") || {
-    exit $?
-  }
-  if [[ "$instances" == "" ]]
-  then
-    pfset "$promptfile" "instance" "$instance" && echo "Instance '$instance' OK."
-    break
-  else
-    err "Machine name '$instance' appears to be in use. Please select another."
-  fi
-done
-
-# Image
-while true
-do
-  if yesno "Would you like to use an existing Arch image?"
-  then
-    while true
-    do
-      echo "Existing images: "
-      echo "$(_GcloudOrErr 'gcloud compute images list')" || {
-        result="$?"
-        err "Could not get images from your project!"
-        exit $result
-      }
-      prompt "Please select an Arch image:"
-      read imgname
-      images=$(_GcloudOrErr "gcloud $_gcfmt compute images list $imgname") || {
-        result="$?"
-        err "Could not get images from your project!"
-        err "$images"
-        exit $result
-      }
-      if ! [[ "$images" == "$imgname" ]]
-      then
-        err "Existing image $imgname not found."
-        err "Please provide the name of an image in your project, or add a new image to your project."
-      else
-        pfset "$promptfile" "image" "$imgname" && echo "Image '$imgname' found."
-        break 2
-      fi
-    done
-  else
-    # TODO Support building a new image.
-    err "Building a new image is not yet supported."
-  fi
-done
 
 echo "Collected information about '$PLATFORM'!"

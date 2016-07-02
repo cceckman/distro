@@ -2,15 +2,11 @@
 # firstlogin for cceckman. Set up home, etc.
 # This should mostly / probably work on platforms other than Arch.
 
-myuser="cceckman"
-
-f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
-
-if [[ "$USER" != "$myuser" ]]
-then
- err "Uh oh! Expected to set up user $myuser, but acting as $USER instead."
- exit 9;
-fi
+# Install AUR packages as user, so that we aren't installing as root.
+f=common/installaur.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+installaur $(cat users/$USER/aurpkgs) || {
+  >&2 echo "Could not install some AUR packages: code $?" && exit 3;
+}
 
 pushd $HOME # Make sure we have a good point of reference.
 
@@ -18,26 +14,24 @@ pushd $HOME # Make sure we have a good point of reference.
 # or not depending on what's available.
 
 # Tilde repository gets special treatment.
-git clone git@github.com:cceckman/Tilde.git Tilde && mv Tilde/.git . && rm -rf Tilde && git reset --hard
+(git clone git@github.com:cceckman/Tilde.git Tilde 2>&1 || exit $? ) && \
+  mv Tilde/.git . && rm -rf Tilde && git reset --hard && \
+  git submodule update --recursive --init
 
-# CLONE REPOSITORIES
-# Copy down repositories I like, and
-GH_REPOS="cceckman/cce3 cceckman/distro cceckman/cceckman.github.io"
-GH_PREFIX="$HOME/r"
-GO_PREFIX="$HOME/go" # Keep in sync with Tilde/.bashrc
-mkdir -p "${GH_PREFIX}"
-mkdir "${HOME}/r"
-for REPO in "${GH_REPOS}"
-do
-  SHORT="$(basename ${REPO})"
-  git clone "git@github.com:${REPO}" "${GH_PREFIX}/${SHORT}" || {
-    err "Error encountered in cloning ${REPO}! Aborting."
-    exit 9
-  }
-  # Support Go directory structure. Assume $HOME/go is in $GOPATH.
-  GOTOOLPATH="${GO_PREFIX}/src/github.com/${REPO}"
-  mkdir -p $(dirname $GOTOOLPATH) && ln -s "${GH_PREFIX}/${SHORT}" ${GOTOOLPATH}
-done
-# DONE
+# And then use the acquired script to get the latest.
+$HOME/scripts/update-repos || exit $?
+
+
+# My magic for a random list of lowercase characters:
+# python -c 'import random; import string; ls = list(string.ascii_lowercase); random.shuffle(ls); print("".join(ls))'
+s='pmwrovsxncbtlqgdejiyahkzuf'
+a='abcdefghijklmnopqrstuvwxyz'
+git config --global user.email $(echo 'wxpjtoi@wwowblpq.wgl' | tr $s $a)
+# Yes; just obfuscated, not encrypted.
+git config --global user.name "Charles Eckman"
+git config --global core.editor "vim"
+git config --global diff.tool "meld"
 
 popd # $HOME
+
+exit $?

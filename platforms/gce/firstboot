@@ -1,0 +1,31 @@
+#!/bin/bash
+# Ambroix for GCE
+# Started on the first boot of the machine, as root.
+
+# Collect plugins
+f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/installpkgs.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=platforms/gce/helpers.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+
+# Run update.
+pacman-key --refresh-keys
+pacman --noconfirm -Syyu
+
+echo "Firstboot for platform $PLATFORM started!"
+
+# TODO: Set up partitions; add swap.
+installpkgs || { >&2 echo "Could not install some packages: code $?" && exit 3; }
+
+
+# Set locale settings
+# Ignore time zone; we run in UTC
+ln -s /usr/share/zoneinfo/UTC /etc/localtime
+sed -i 's/^#en_US/en_US/' /etc/locale.gen && locale-gen
+echo LANG=en_US > /etc/locale.conf
+
+# Last step:remove this script from startup,
+zonestr=$(curl -L -H 'Metadata-Flavor:Google' http://metadata.google.internal/computeMetadata/v1/instance/zone)
+project=$(echo "$zonestr" | sed 's:^.*projects/\([^/]*\).*$:\1:')
+zone=$(echo "$zonestr" | sed 's:^.*zones/\([^/]*\).*$:\1:')
+gcloud compute instances remove-metadata --zone="/$project/$zone" $(hostname -s) --keys startup-script
+# TODO: Remove its permission after the fact.

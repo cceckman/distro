@@ -8,6 +8,7 @@ f=common/yesno.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/prompt.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/mkfirstboot.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
 f=platforms/gce/helpers.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
@@ -16,4 +17,42 @@ promptfile="$1"
 echo "Reading from promptfile $promptfile."
 
 instance=$(pfget "$promptfile" "instance")
-echo "Creating GCE instance $instance"
+image=$(pfget "$promptfile" "image")
+machtype=$(pfget "$promptfile" "machtype")
+echo "Creating GCE instance $instance, type $machtype, with startup image $image"
+
+# Insert promptfile contents into firstboot script before uploading
+firstboottmp=$(mktemp)
+# A bit of cheating here; mkfirstboot uses PLAT_PROMPT and USER_PROMPT from ambroix.
+mkfirstboot > $firstboottmp
+
+# Metadata value length limit is 32768 bytes, per https://cloud.google.com/compute/docs/startupscript
+if [ $( cat $firstboottmp | wc -c) -gt 32768 ]
+then
+  err "firstboot script $firstboottmp is too long (>32768 bytes)! Aborting."
+  exit 10
+fi
+
+if yesno "Please confirm; you will be billed for this instance!"
+then
+  # Confirmed; create instance.
+  # Allow 'compute' API access so that firstboot script can remove itself.
+	if ! _GcloudOrErr gcloud compute instances create "$instance" \
+		--image "$image" \
+		--boot-disk-type "pd-standard" \
+    --machine-type "$machtype" \
+    --scopes default="https://www.googleapis.com/auth/compute" \
+		--metadata-from-file startup-script=${firstboottmp}
+	then
+		err "Could not create instance $instance."
+		exit $?
+	fi
+else
+	err "Creating instance $instance cancelled by user."
+	exit 9
+fi
+
+echo "Great success! Run this command to see readiness status:"
+echo "\$ gcloud compute ssh $TGT_USER@$instance -- 'tail -f /tmp/firstboot-output' "
+echo "Then this to log in:"
+echo "\$ gcloud compute ssh $TGT_USER@$instance -- -A "
