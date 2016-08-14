@@ -3,7 +3,7 @@
 
 set -e
 for sig in INT TERM EXIT; do
-  trap "echo 'Encountered an error! Dropping into bash. && bash; [[ $sig == EXIT ]] || (trap - $sig EXIT; kill -$sig $$)" $sig 
+  trap "echo 'Encountered an error! Dropping into bash.' && bash; [[ $sig == EXIT ]] || (trap - $sig EXIT; kill -$sig $$)" $sig 
 done
 
 set -x
@@ -31,3 +31,4 @@ systemctl enable dhcpcd@$(ip link | grep -Po '(en|eth)[^: ]*(?=:)').service
 
 
 # TODO Auto-start the firstboot upon reboot.
+
