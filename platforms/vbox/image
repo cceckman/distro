@@ -10,7 +10,7 @@ promptfile="$1"
 echo "Using data from $promptfile..."
 
 set -e
-for sig in INT TERM EXIT; do
+for sig in INT TERM; do
   trap "echo 'Encountered an error! Dropping into bash.' && bash; [[ $sig == EXIT ]] || (trap - $sig EXIT; kill -$sig $$)" $sig 
 done
 
