@@ -30,7 +30,9 @@ then
   exit 9
 fi
 
-sudo platforms/$TGT_PLATFORM/image.sudo.sh "$disk" "$hostname" || {
+# Global variables needed for mkfirstboot.
+export PLAT_PROMPT USER_PROMPT TGT_USER TGT_PLATFORM
+sudo -E platforms/$TGT_PLATFORM/image.sudo.sh "$disk" "$hostname" || {
   err "Return code $? from image.sudo.sh."
 }
 

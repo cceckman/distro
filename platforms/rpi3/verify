@@ -8,15 +8,13 @@ echo "Checking sane host environment for platform '$PLATFORM'..."
 f=common/depend.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
-depend curl || {
-  err "curl command isn't installed"
-  exit 3;
-}
-
-depend bsdtar || {
-  err "curl command isn't installed"
-  exit 3;
-}
+for bin in curl bsdtar chroot
+do
+  depend "$bin" || {
+    err "$bin command isn't installed"
+    exit 3;
+  }
+done
 
 # Later on (in `prompt`), we'll want to check that the gcloud configuration is
 # correct & filled appropriately.
