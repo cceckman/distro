@@ -15,8 +15,8 @@ for command in "parted mkfs.ext4 mkswap curl timedatectl rankmirrors pacstrap ge
 do
   depend $command || {
     err "$command not found in PATH!"
+    exit 3
   }
-  exit 3
 done
 
 
