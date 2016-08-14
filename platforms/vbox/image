@@ -43,8 +43,8 @@ genfstab -p /mnt >> /mnt/etc/fstab || exit
 
 pfget "$promptfile" hostname > /mnt/etc/hostname
 
-mkdir -p /mnt/tmp/ && \
- cp platforms/vbox/image.chroot.sh /mnt/tmp/image.sh && \
- chmod +x /mnt/tmp/image.sh && \
-  arch-chroot /mnt /tmp/image.sh
+mkdir -p /mnt/usr/bin// && \
+ cp platforms/vbox/image.chroot.sh /mnt/usr/bin/initimage.sh && \
+ chmod +x /mnt/usr/bin/initimage.sh && \
+  arch-chroot /mnt /usr/bin/initimage.sh
  
