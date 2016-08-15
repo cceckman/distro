@@ -48,5 +48,9 @@ mkdir -p /mnt/usr/bin// && \
  chmod +x /mnt/usr/bin/initimage.sh && \
   arch-chroot /mnt /usr/bin/initimage.sh
 
+sync
+umount /dev/sda2
+swapoff /dev/sda3
+
 echo "All done! Reboot to start the VM."
 trap - EXIT && exit 0
