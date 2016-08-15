@@ -2,7 +2,7 @@
 # Set up the chroot of the new VM.
 
 set -e
-for sig in INT TERM EXIT; do
+for sig in INT TERM EXIT; do 
   trap "echo 'Encountered an error! Dropping into bash.' && bash; [[ $sig == EXIT ]] || (trap - $sig EXIT; kill -$sig $$)" $sig 
 done
 
@@ -10,7 +10,7 @@ set -x
 
 # Set up VirtualBox.
 pacman-key --refresh-keys
-pacman --noconfirm -S linux-headers virtualbox-guest-utils
+pacman --noconfirm -S linux-headers virtualbox-guest-utils virtualbox-guest-dkms
 systemctl enable vboxservice.service
 
 
@@ -30,4 +30,4 @@ grub-mkconfig -o /boot/grub/grub.cfg
 systemctl enable dhcpcd.service
 
 # TODO Auto-start the firstboot upon reboot.
-set +e
+trap - EXIT
