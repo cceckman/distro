@@ -27,8 +27,7 @@ echo 'GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT splash iomem=relax
 grub-mkconfig -o /boot/grub/grub.cfg
 
 # Ensure that dhcpcd starts next time around
-systemctl enable dhcpcd@$(ip link | grep -Po '(en|eth)[^: ]*(?=:)').service
-
+systemctl enable dhcpcd.service
 
 # TODO Auto-start the firstboot upon reboot.
-
+set +e
