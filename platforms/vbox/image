@@ -47,4 +47,6 @@ mkdir -p /mnt/usr/bin// && \
  cp platforms/vbox/image.chroot.sh /mnt/usr/bin/initimage.sh && \
  chmod +x /mnt/usr/bin/initimage.sh && \
   arch-chroot /mnt /usr/bin/initimage.sh
- 
+
+echo "All done! Reboot to start the VM."
+trap - EXIT && exit 0
