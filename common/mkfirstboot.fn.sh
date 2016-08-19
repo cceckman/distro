@@ -22,16 +22,21 @@ cat <<-EOF > \$upromptfile
 $(cat $USER_PROMPT | sed 's/EOF/XOF/g')
 EOF
 
+# *really* wait for the network to be up.
+fping -r 20 google.com >> \$output || {
+  echo "Could not reach the network!" >> \&output
+  exit 1
+}
 
 # Install git
-pacman --noconfirm -Syyu git || {
+pacman --noconfirm -Syyu git >> \$output || {
   echo "Could not install git!" >> \$output
   exit 1
 }
 
 {
   pushd /tmp && \
-    git clone http://$REPO -o distro \
+    git clone http://$REPO -o distro >> \$output \
     && popd 
 } || {
   echo "Could not clone repository ${REPO}!" >> \$output
@@ -46,7 +51,7 @@ cd /tmp/distro
 
 if git branch --remote | grep -q "\$(hostname -s)"
 then
-  git checkout \$(hostname -s)
+  git checkout \$(hostname -s) >> \$output
 fi
 
 {
