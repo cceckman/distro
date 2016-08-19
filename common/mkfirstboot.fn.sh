@@ -23,7 +23,7 @@ $(cat $USER_PROMPT | sed 's/EOF/XOF/g')
 EOF
 
 # *really* wait for the network to be up.
-fping -r 20 google.com >> \$output || {
+fping -r 20 8.8.8.8 >> \$output || {
   echo "Could not reach the network!" >> \&output
   exit 1
 }
