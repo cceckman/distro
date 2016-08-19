@@ -28,6 +28,8 @@ grub-mkconfig -o /boot/grub/grub.cfg
 
 # Ensure that dhcpcd starts next time around
 systemctl enable dhcpcd.service
+# And that we can tell the network's up
+pacman --noconfirm -Sy fping
 
 # TODO Auto-start the firstboot upon reboot.
 trap - EXIT
