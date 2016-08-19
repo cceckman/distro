@@ -1,6 +1,14 @@
 # Ambroix
 A Linux build brought to you by [Arch](http://archlinux.org) and [cceckman](http://cceckman.com).
 
+### What's the command I'm looking for?
+From an Arch live image:
+
+```
+/bin/bash --init-file <(curl -Lo raw.githubusercontent.com/cceckman/distro/master/download.sh)
+./ambroix vbox cceckman
+```
+
 ## About
 
 ### Well, technically...
