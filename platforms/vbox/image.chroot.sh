@@ -10,7 +10,7 @@ set -x
 
 # Set up VirtualBox.
 pacman-key --refresh-keys
-pacman --noconfirm -S linux-headers virtualbox-guest-utils virtualbox-guest-dkms
+pacman --noconfirm -S linux-headers virtualbox-guest-utils virtualbox-guest-dkms linux-headers
 systemctl enable vboxservice.service
 
 
