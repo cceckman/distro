@@ -5,6 +5,7 @@
 # Collect plugins
 f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/setfirstboot.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
 promptfile="$1"
 echo "Using data from $promptfile..."
@@ -54,6 +55,9 @@ mkdir -p /mnt/usr/bin/ && \
  cp platforms/vbox/image.chroot.sh /mnt/usr/bin/initimage.sh && \
  chmod +x /mnt/usr/bin/initimage.sh && \
   arch-chroot /mnt /usr/bin/initimage.sh
+
+# Image initialized; now set up firstboot.
+setfirstboot /mnt
 
 sync
 umount ${disk}2

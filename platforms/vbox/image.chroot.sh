@@ -1,9 +1,6 @@
 #!/bin/bash -i
 # Set up the chroot of the new VM.
 
-f=common/err.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
-f=common/mkfirstboot.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
-
 set -e
 for sig in INT TERM EXIT; do 
   trap "echo 'Encountered an error! Dropping into bash.' && bash; [[ $sig == EXIT ]] || (trap - $sig EXIT; kill -$sig $$)" $sig 

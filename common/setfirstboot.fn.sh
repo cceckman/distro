@@ -14,9 +14,11 @@ Description=Distribution first-boot
 Requires=network-online.target
 After=network-online.target
 Support=http://cceckman.com/r/distro
+
 [Service]
 Type=oneshot
 ExecStart=$binpath
+
 [Install]
 WantedBy=multi-user.target
 EOF
