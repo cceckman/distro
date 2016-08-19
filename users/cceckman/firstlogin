@@ -11,7 +11,7 @@ installaur $(cat users/$USER/aurpkgs) || {
 pushd $HOME # Make sure we have a good point of reference.
 
 # TODO Make sure active SSH credentials work for Github; prompt to make new ones
-# or not depending.
+# or not depending on what's available.
 
 # Tilde repository gets special treatment.
 (git clone git@github.com:cceckman/Tilde.git Tilde 2>&1 || exit $? ) && \

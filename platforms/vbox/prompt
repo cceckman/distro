@@ -45,13 +45,13 @@ do
     for x in $(lsblk $disk -lno name)
     do
       dev="/dev/${x}"
-      if ! findmnt $dev >/dev/null
+      if findmnt $dev >/dev/null
       then
         err "'$disk' is not usable; $dev mounted"
         continue 1
       elif swapon --noheadings --show=name | grep -q "$dev"
       then
-        err "'$disk' is not usable; $dev mounted"
+        err "'$disk' is not usable; $dev used as swap"
         continue 1
       fi
     done

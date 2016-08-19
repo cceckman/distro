@@ -2,6 +2,7 @@
 # Per https://archlinuxarm.org/platforms/armv8/broadcom/raspberry-pi-3,
 # set up an SD card with an ARM Arch image.
 
+
 if (( $# != 1 ))
 then
   echo "Please provide the SD card /dev/ device as argument 1."
