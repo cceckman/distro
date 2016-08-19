@@ -1,2 +1,3 @@
 #!/bin/sh
 # Do nothing for now. Pre-existing sanity check that this exists.
+echo "Firstboot script run" > /tmp/firstboot-run
