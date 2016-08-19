@@ -9,6 +9,13 @@ f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 promptfile="$1"
 echo "Using data from $promptfile..."
 
+disk="$(pfget "$promptfile" "disk")"
+name="$(pfget "$promptfile" "hostname")"
+echo "Drive: $disk"
+echo "Name: $name"
+echo "Hit enter to start!"
+read
+
 set -e
 for sig in INT TERM; do
   trap "echo 'Encountered an error! Dropping into bash.' && bash; [[ $sig == EXIT ]] || (trap - $sig EXIT; kill -$sig $$)" $sig 
@@ -20,14 +27,14 @@ set -x
 timedatectl set-ntp true # enable NTP-based time.
 
 # Set up the disk: use GPT (rather than MBR); leave 1MiB for GRUB; and leave 8GB for swap.
-parted --script /dev/sda mklabel gpt || exit
-parted --script --align optimal /dev/sda -- mkpart primary 0% 1M set 1 bios_grub on name 1 grub || exit
-parted --script --align optimal /dev/sda -- mkpart primary ext4 1M -8GiB name 2 root || exit
-parted --script --align optimal /dev/sda -- mkpart primary linux-swap -8GiB 100% name 3 swap || exit
+parted --script $disk mklabel gpt || exit
+parted --script --align optimal $disk -- mkpart primary 0% 1M set 1 bios_grub on name 1 grub || exit
+parted --script --align optimal $disk -- mkpart primary ext4 1M -8GiB name 2 root || exit
+parted --script --align optimal $disk -- mkpart primary linux-swap -8GiB 100% name 3 swap || exit
 
 # Format root partition and swap
-mkfs -t ext4 /dev/sda2 && mount /dev/sda2 /mnt || exit
-mkswap /dev/sda3 && swapon /dev/sda3 || exit
+mkfs -t ext4 ${disk}2 && mount ${disk}2 /mnt || exit
+mkswap ${disk}3 && swapon ${disk}3 || exit
 
 # Update mirror list and package DB. This isn't the most optimal assignment, but good enough till we get really started.
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup # back up mirror list
@@ -49,8 +56,8 @@ mkdir -p /mnt/usr/bin// && \
   arch-chroot /mnt /usr/bin/initimage.sh
 
 sync
-umount /dev/sda2
-swapoff /dev/sda3
+umount ${disk}2
+swapoff ${disk}3
 
 echo "All done! Reboot to start the VM."
 trap - EXIT && exit 0
