@@ -10,7 +10,7 @@ set -x
 
 # Set up VirtualBox.
 pacman-key --refresh-keys
-pacman --noconfirm -S linux-headers virtualbox-guest-utils virtualbox-guest-dkms linux-headers
+pacman --noconfirm -Sy linux-headers virtualbox-guest-utils virtualbox-guest-dkms linux-headers
 systemctl enable vboxservice.service
 
 
@@ -20,7 +20,7 @@ sed -i "s/^MODULES=\"/MODULES=\"$vbox_modules/" /etc/mkinitcpio.conf
 mkinitcpio -p linux
 
 # Install GRUB
-pacman --noconfirm -S grub
+pacman --noconfirm -Sy grub
 grub-install --target=i386-pc --recheck /dev/sda
 
 echo 'GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT splash iomem=relaxed"' >> /etc/default/grub
