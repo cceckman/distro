@@ -43,7 +43,7 @@ curl -o - 'https://www.archlinux.org/mirrorlist/?country=US&protocol=https&ip_ve
 rankmirrors -n 10 /tmp/mirrorlist > /etc/pacman.d/mirrorlist # only grab top 10 mirrors
 
 # Install...
-pacstrap /mnt base || exit
+pacstrap /mnt base $ADDL_PKGS || exit
 # Wait...
 
 # Generate /etc/fstab for actual booting.
@@ -51,12 +51,21 @@ genfstab -p /mnt >> /mnt/etc/fstab || exit
 
 pfget "$promptfile" hostname > /mnt/etc/hostname
 
+# Install some additional packages
+arch-chroot /mnt \
+  pacman-key --refresh-keys
+arch-chroot /mnt \
+  pacman --noconfirm -Sy \
+    linux-headers virtualbox-guest-utils virtualbox-guest-dkms linux-headers \
+    grub \
+    fping 
+
 mkdir -p /mnt/usr/bin/ && \
  cp platforms/vbox/image.chroot.sh /mnt/usr/bin/initimage.sh && \
  chmod +x /mnt/usr/bin/initimage.sh && \
  arch-chroot /mnt /usr/bin/initimage.sh
 
-# Within the chroot, set up
+# Within the chroot, set up user
 pfget "$promptfile" pass \
 | arch-chroot /mnt useradd \
   --expiredate "1970-01-01" \
