@@ -65,10 +65,8 @@ mkdir -p /mnt/usr/bin/ && \
  chmod +x /mnt/usr/bin/initimage.sh && \
  arch-chroot /mnt /usr/bin/initimage.sh
 
-# Within the chroot, set up user
-pfget "$promptfile" pass \
-| arch-chroot /mnt useradd \
-  --expiredate "1970-01-01" \
+arch-chroot /mnt useradd \
+  --expiredate "$(date -I)" \
   --create-home \
   --user-group \
   --groups wheel \
