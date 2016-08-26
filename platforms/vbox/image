@@ -54,11 +54,11 @@ pfget "$promptfile" hostname > /mnt/etc/hostname
 mkdir -p /mnt/usr/bin/ && \
  cp platforms/vbox/image.chroot.sh /mnt/usr/bin/initimage.sh && \
  chmod +x /mnt/usr/bin/initimage.sh && \
-  arch-chroot /mnt /usr/bin/initimage.sh
+ arch-chroot /mnt /usr/bin/initimage.sh
 
 # Within the chroot, set up
-arch-chroot /mnt useradd \
-  --password "$(openssl rand -base64 50)" \
+openssl rand -hex 60 \
+| arch-chroot /mnt useradd \
   --expiredate "$(date -I)" \
   --create-home \
   --user-group \
