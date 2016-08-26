@@ -56,6 +56,15 @@ mkdir -p /mnt/usr/bin/ && \
  chmod +x /mnt/usr/bin/initimage.sh && \
   arch-chroot /mnt /usr/bin/initimage.sh
 
+# Within the chroot, set up
+arch-chroot /mnt useradd \
+  --password "$(openssl rand -base64 50)" \
+  --expiredate "$(date -I)" \
+  --create-home \
+  --user-group \
+  --groups wheel \
+  $TGT_USER
+
 # Image initialized; now set up firstboot.
 setfirstboot /mnt
 
