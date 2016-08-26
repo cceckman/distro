@@ -64,6 +64,7 @@ pfget "$promptfile" pass \
   --user-group \
   --groups wheel \
   $TGT_USER
+arch-chroot /mnt passwd -e root
 
 # Image initialized; now set up firstboot.
 setfirstboot /mnt
