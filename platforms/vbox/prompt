@@ -61,4 +61,20 @@ do
   break
 done
 
+# Request a temporary password
+while true
+do
+  prompt "Please choose a (temporary) password. DON'T put your permanent password here!"
+  read pass
+  if [[ "$pass" != '' ]]
+  then
+    pfset "$promptfile" "pass" "$pass" && echo "Temporary password OK."
+    break
+  else
+    err "'$pass' is not a valid password"
+  fi
+done
+
+
+
 echo "Collected information about '$PLATFORM'!"
