@@ -21,7 +21,7 @@ echo LANG=en_US > /etc/locale.conf
 # OK with default elsewhere
 
 # Start the firstlogin script on login.
-TGT_HOME=$(su -c 'echo $HOME' "$TGT_USER")
+TGT_HOME="$(eval echo "~$TGT_USER")"
 cat <<EOF >$TGT_HOME/.profile
 #!/bin/sh -i
 pushd $PWD
@@ -33,7 +33,7 @@ chmod +x $TGT_HOME/.profile
 chown ${TGT_USER}:${TGT_USER} $TGT_HOME/.profile
 
 # Set up docker.
-dockersetup
+#dockersetup
 
 # Clear bash_profile.
 rm $TGT_HOME/.bash_profile
