@@ -39,6 +39,7 @@ dockersetup
 rm $TGT_HOME/.bash_profile
 
 # Set up VNC
-headlessvnc
+#headlessvnc
 # And allow linger for it
-loginctl enable-linger $TGT_USER
+#loginctl enable-linger $TGT_USER
+
