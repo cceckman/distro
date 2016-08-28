@@ -73,7 +73,7 @@ arch-chroot /mnt useradd \
   $TGT_USER
 arch-chroot /mnt sed -i "s/${TGT_USER}:!/${TGT_USER}:/" /etc/shadow
 arch-chroot /mnt passwd -e ${TGT_USER}
-# arch-chroot /mnt passwd -l root
+arch-chroot /mnt passwd -l root
 
 # Image initialized; now set up firstboot.
 setfirstboot /mnt
