@@ -1,3 +1,23 @@
-#!/bin/sh
-# Do nothing for now. Pre-existing sanity check that this exists.
-echo "Firstboot script run" > /tmp/firstboot-run
+#!/bin/bash
+# Install some packages.
+
+# Collect plugins
+f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/installpkgs.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+
+# Run update.
+pacman-key --refresh-keys
+pacman --noconfirm -Syyu
+
+echo "Firstboot for platform $PLATFORM started!"
+
+installpkgs || { >&2 echo "Could not install some packages: code $?" && exit 3; }
+
+
+# Set locale settings
+# Ignore time zone; we run in UTC
+ln -s /usr/share/zoneinfo/UTC /etc/localtime
+sed -i 's/^#en_US/en_US/' /etc/locale.gen && locale-gen
+echo LANG=en_US > /etc/locale.conf
+
+
