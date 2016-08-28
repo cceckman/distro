@@ -39,8 +39,11 @@ do
     case "$key" in
 
       authkey)
-        if yesno "Upload an authorized SSH key?"
+        if yesno "Skip loading SSH keys?"
         then
+          pfset "$promptfile" "authkey" ""
+          break
+        else
           echo "Which pubkey would you like to upload?"
           select opt in $(ls $HOME/.ssh/*.pub)
           do
@@ -53,9 +56,6 @@ do
           k="$(cat $authkey)"
           echo "Will use authorized key: $k"
           pfset "$promptfile" "authkey" "$k"
-          break
-        else
-          pfset "$promptfile" "authkey" ""
           break
         fi
         ;;
