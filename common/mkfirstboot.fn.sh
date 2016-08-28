@@ -24,7 +24,7 @@ EOF
 
 # *really* wait for the network to be up.
 fping -r 20 8.8.8.8 >> \$output || {
-  echo "Could not reach the network!" >> \&output
+  echo "Could not reach the network!" >> \$output
   exit 1
 }
 
@@ -71,7 +71,7 @@ fi
   then
     echo "Running hook 'firstboot' for user '$TGT_USER'" >> \$output
     users/$TGT_USER/firstboot \$upromptfile 2>&1 >>\$output \
-      && echo "Hook 'firstboot' for user '$TGT_USER' complete." \
+      && echo "Hook 'firstboot' for user '$TGT_USER' complete with code \$?." \
       >> \$output
   else
     echo  "Skipping hook 'firstboot' for user '$TGT_USER'" >> \$output
