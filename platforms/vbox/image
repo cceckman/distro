@@ -67,13 +67,12 @@ mkdir -p /mnt/usr/bin/ && \
 
 # Within the chroot, set up user
 arch-chroot /mnt useradd \
-  --expiredate "1970-01-01" \
   --create-home \
   --user-group \
   --groups wheel \
   $TGT_USER
-arch-chroot /mnt passwd -d $TGT_USER
-arch-chroot /mnt passwd -l root
+# arch-chroot /mnt passwd -d $TGT_USER
+# arch-chroot /mnt passwd -l root
 
 # Image initialized; now set up firstboot.
 setfirstboot /mnt
