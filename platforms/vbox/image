@@ -66,13 +66,13 @@ mkdir -p /mnt/usr/bin/ && \
  arch-chroot /mnt /usr/bin/initimage.sh
 
 # Within the chroot, set up user
-echo "Set $TGT_USER's password on the new machine below."
 arch-chroot /mnt useradd \
   --expiredate "1970-01-01" \
   --create-home \
   --user-group \
   --groups wheel \
   $TGT_USER
+arch-chroot /mnt passwd -d $TGT_USER
 arch-chroot /mnt passwd -l root
 
 # Image initialized; now set up firstboot.
