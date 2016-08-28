@@ -65,16 +65,6 @@ mkdir -p /mnt/usr/bin/ && \
  chmod +x /mnt/usr/bin/initimage.sh && \
  arch-chroot /mnt /usr/bin/initimage.sh
 
-# Within the chroot, set up user
-arch-chroot /mnt useradd \
-  --create-home \
-  --user-group \
-  --groups wheel \
-  $TGT_USER
-arch-chroot /mnt sed -i "s/${TGT_USER}:!/${TGT_USER}:/" /etc/shadow
-arch-chroot /mnt passwd -e ${TGT_USER}
-arch-chroot /mnt passwd -l root
-
 # Image initialized; now set up firstboot.
 setfirstboot /mnt
 

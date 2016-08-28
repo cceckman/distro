@@ -4,6 +4,7 @@
 # Collect plugins
 f=common/kvpf.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/installpkgs.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
+f=common/usersetup.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
 # Run update.
 pacman-key --refresh-keys
@@ -20,4 +21,4 @@ ln -s /usr/share/zoneinfo/UTC /etc/localtime
 sed -i 's/^#en_US/en_US/' /etc/locale.gen && locale-gen
 echo LANG=en_US > /etc/locale.conf
 
-
+usersetup "${TGT_USER}"
