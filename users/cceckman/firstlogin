@@ -14,11 +14,6 @@ echo "Using data from $promptfile..."
 # Enable sudo mode for future commands.
 sudo touch /tmp/foo
 
-# Install AUR packages as user, so that we aren't installing as root.
-installaur $(cat users/$USER/aurpkgs) || {
-  >&2 echo "Could not install some AUR packages: code $?" && exit 3;
-}
-
 pushd $HOME # Make sure we have a good point of reference.
 
 # TODO Make sure active SSH credentials work for Github; prompt to make new ones
@@ -76,5 +71,10 @@ git config --global core.editor "vim"
 git config --global diff.tool "meld"
 
 popd # $HOME
+
+# Install AUR packages as user, so that we aren't installing as root.
+installaur $(cat users/$USER/aurpkgs) || {
+  >&2 echo "Could not install some AUR packages: code $?" && exit 3;
+}
 
 exit $?
