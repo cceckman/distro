@@ -40,9 +40,9 @@ HRD
 
     {
       curl -X POST -d @$keyreq -u ${gh_username}:${token} https://api.github.com/user/keys \
-      && { echo "Upload successful!"; break } 
+      && { echo "Upload successful!"; break; } 
     } || { 
-      echo "Didn't upload Github key! Let's retry."
+      echo "Didn't upload Github key! Let's retry.";
     }
   done
 else
