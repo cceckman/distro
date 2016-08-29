@@ -22,6 +22,8 @@ cat <<-EOF > \$upromptfile
 $(cat $USER_PROMPT | sed 's/EOF/XOF/g')
 EOF
 
+chmod 0755 \$ppromptfile \$upromptfile
+
 # *really* wait for the network to be up.
 fping -r 20 8.8.8.8 >> \$output || {
   echo "Could not reach the network!" >> \$output

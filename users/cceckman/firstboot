@@ -11,6 +11,8 @@ f=common/headlessvnc.fn.sh; . $f || { >&2 echo "$f not found!" && exit 2; }
 f=platforms/gce/helpers.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 f=common/dockersetup.fn.sh; source $f || { >&2 echo "$f not found!" && exit 2; }
 
+promptfile="$1"
+
 # Install packages as root
 cat users/$TGT_USER/pkgs | xargs pacman --noconfirm -S
 
@@ -25,7 +27,7 @@ TGT_HOME="$(eval echo "~$TGT_USER")"
 cat <<EOF >$TGT_HOME/.profile
 #!/bin/sh -i
 pushd $PWD
-users/$TGT_USER/firstlogin 2>&1 | tee \$HOME/firstlogin.log \
+users/$TGT_USER/firstlogin $promptfile 2>&1 | tee \$HOME/firstlogin.log \
   && mv $TGT_HOME/.profile $TGT_HOME/.profile.disabled
 popd
 EOF
