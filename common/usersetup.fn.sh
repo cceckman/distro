@@ -9,7 +9,7 @@ usersetup() {
   useradd \
     --create-home \
     --user-group \
-    --groups wheel \
+    --groups wheel,ssh-users \
     $TGT_USER
   sed -i "s/${TGT_USER}:!/${TGT_USER}:/" /etc/shadow
   passwd -e ${TGT_USER}
