@@ -18,7 +18,7 @@ pushd $HOME # Make sure we have a good point of reference.
 
 # TODO Make sure active SSH credentials work for Github; prompt to make new ones
 # or not depending on what's available.
-if [ "$(pfget "$promptfile" "genkey")" == y* ]
+if [ "$(pfget "$promptfile" "genkey")" == "yes" ]
 then
   echo "Generating new SSH credentials..."
   edkey=
